@@ -13,13 +13,13 @@ namespace nds
 {
     namespace encoders
     {
-        class boost_text : encoder
+        class boost_text : encoder<boost_text>
         {
         public:
             using linear_type = std::string;
 
             template<class T>
-            static linear_type encode(T& t)
+            static linear_type encode(const T& t)
             {
                 std::stringstream buffer;
                 boost::archive::text_oarchive ar(buffer);
@@ -40,6 +40,5 @@ namespace nds
         };
     } // encoders
 } // nds
-
 
 #endif // NDS_ENCODER_BOOST_TEXT_H_NDS
