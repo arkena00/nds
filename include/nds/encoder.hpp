@@ -31,8 +31,9 @@ namespace nds
     };
 
     template<>
-    struct encoder<encoders::global>
+    class encoder<encoders::global>
     {
+    public:
         // encode
         template<class Linear_Type, class Scope = encoders::global, class T>
         static Linear_Type encode(const T& in);
@@ -66,6 +67,6 @@ namespace nds
 
 } // nds
 
-#include "encoder.tpp"
+#include "encoder.tcc"
 
 #endif // NDS_ENCODER_H_NDS
