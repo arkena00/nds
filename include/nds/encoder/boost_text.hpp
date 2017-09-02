@@ -1,6 +1,7 @@
 #ifndef NDS_ENCODER_BOOST_TEXT_H_NDS
 #define NDS_ENCODER_BOOST_TEXT_H_NDS
 
+#include <sstream>
 #include <nds/encoder.hpp>
 
 #include <boost/archive/text_iarchive.hpp>
