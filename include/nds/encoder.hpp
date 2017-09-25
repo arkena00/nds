@@ -1,6 +1,11 @@
 #ifndef NDS_ENCODER_H_NDS
 #define NDS_ENCODER_H_NDS
 
+/*! usage
+ * void nds::encoder<>::encode(input);
+ * Return_type nds::encoder<>::encode<Return_type>(input);
+ */
+
 #include <nds/trait.hpp>
 
 namespace nds
@@ -21,11 +26,14 @@ namespace nds
         template<class T>
         static trait::linear_type<Encoder, T> encode(const T& in);
 
+        template<class Scope = encoders::global, class T>
+        static void encode(T& in);
+
         // decode
         template<class T>
         static T decode(const typename trait::linear_type<Encoder, T>& in);
 
-        // encode T with T::Linear_Type
+        // encode T with T::linear_type
         //template<class T>
         //static typename T::linear_type encode(const T& in);
     };
@@ -35,32 +43,38 @@ namespace nds
     {
     public:
         // encode
-        template<class Linear_Type, class Scope = encoders::global, class T>
-        static Linear_Type encode(const T& in);
+        template<class linear_type, class Scope = encoders::global, class T>
+        static linear_type encode(const T& in);
+
+		template<class Scope = encoders::global, class T>
+        static void encode(T& in);
 
         // decode
-        template<class T, class Scope = encoders::global, class Linear_Type>
-        static T decode(const Linear_Type& in);
+        template<class T, class Scope = encoders::global, class linear_type>
+        static T decode(const linear_type& in);
 
-        template<class Linear_Type, class T>
-        static void decode(const Linear_Type& in, T& out);
+        template<class linear_type, class T>
+        static void decode(const linear_type& in, T& out);
+
+		template<class T>
+        static void decode(T& t);
     };
 
     //// GLOBAL
     // encode
     /*
-    template<class Linear_Type, class Scope = encoders::global, class T>
-    inline Linear_Type encode(const T& in)
+    template<class linear_type, class Scope = encoders::global, class T>
+    inline linear_type encode(const T& in)
     {
-        nds::encoder<>::encode<Linear_Type, Scope>(in);
+        nds::encoder<>::encode<linear_type, Scope>(in);
     }
 
     // decode
-    template<class T, class Class_Scope, class Linear_Type>
-    T decode(const Linear_Type& in);
+    template<class T, class Class_Scope, class linear_type>
+    T decode(const linear_type& in);
 
-    template<class Linear_Type, class T>
-    inline void decode(const Linear_Type& in, T& out)
+    template<class linear_type, class T>
+    inline void decode(const linear_type& in, T& out)
     {
         nds::encoder<>::decode(in, out);
     }*/
