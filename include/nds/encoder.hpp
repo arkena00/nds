@@ -46,8 +46,9 @@ namespace nds
         template<class linear_type, class Scope = encoders::global, class T>
         static linear_type encode(const T& in);
 
+        // encode directly the ref value
 		template<class Scope = encoders::global, class T>
-        static void encode(T& in);
+        static void encode_ref(T& in);
 
         // decode
         template<class T, class Scope = encoders::global, class linear_type>
