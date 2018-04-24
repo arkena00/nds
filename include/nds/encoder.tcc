@@ -3,7 +3,7 @@ namespace nds
     // encode for Encoder class
     template<class Encoder>
     template<class T>
-    trait::linear_type<Encoder, T> encoder<Encoder>::encode(const T& in)
+    trait::delay_type<Encoder, T> encoder<Encoder>::encode(const T& in)
     {
         return Encoder::encode(in);
     }
@@ -20,7 +20,7 @@ namespace nds
     // decode for Encoder class
     template<class Encoder>
     template<class T>
-    T encoder<Encoder>::decode(const typename trait::linear_type<Encoder, T>& in)
+    T encoder<Encoder>::decode(const typename trait::delay_type<Encoder, T>& in)
     {
         return Encoder::template decode<T>(in);
     }

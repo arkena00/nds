@@ -12,8 +12,8 @@ namespace nds
 {
     namespace trait
     {
-        template<class Encoder, class> struct linear_type_impl { using type = typename Encoder::linear_type; };
-        template<class Encoder, class T> using linear_type = typename linear_type_impl<Encoder, T>::type;
+        template<class Encoder, class> struct delay_type_impl { using type = typename Encoder::linear_type; };
+        template<class Encoder, class T> using delay_type = typename delay_type_impl<Encoder, T>::type;
     } //trait
 
     namespace encoders { class global{}; }
@@ -24,14 +24,14 @@ namespace nds
     public:
         // encode
         template<class T>
-        static trait::linear_type<Encoder, T> encode(const T& in);
+        static trait::delay_type<Encoder, T> encode(const T& in);
 
         template<class Scope = encoders::global, class T>
         static void encode(T& in);
 
         // decode
         template<class T>
-        static T decode(const typename trait::linear_type<Encoder, T>& in);
+        static T decode(const typename trait::delay_type<Encoder, T>& in);
 
         // encode T with T::linear_type
         //template<class T>
