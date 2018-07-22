@@ -26,8 +26,8 @@ namespace nds
         template<class T>
         static trait::delay_type<Encoder, T> encode(const T& in);
 
-        template<class Scope = encoders::global, class T>
-        static void encode(T& in);
+        //template<class Scope = encoders::global, class T>
+        //static void encode(T& in);
 
         // decode
         template<class T>
