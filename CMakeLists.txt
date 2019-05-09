@@ -4,6 +4,7 @@ project(nds)
 
 set(NDS_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(NDS_BIN_ROOT ${NDS_ROOT}/bin)
+set(NDS_THIRD_PARTY_ROOT ${NDS_ROOT}/third_party)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -16,3 +17,5 @@ add_library(lib_nds OBJECT ${NDS_SOURCES})
 target_include_directories(lib_nds PUBLIC "include")
 
 add_subdirectory(experimental)
+add_subdirectory(benchmark)
+
