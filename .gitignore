@@ -1,6 +1,7 @@
 #ide files
 .idea/
 .vs/
+.vscode/
 
 # binary folders
 **bin/
