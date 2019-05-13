@@ -14,5 +14,6 @@ function(exp_make target_file)
 
 endfunction()
 
+exp_make(encoder)
 exp_make(graph)
 exp_make(graph_type)

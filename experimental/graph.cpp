@@ -71,12 +71,20 @@ node<page>, node<int>*/
 
 
 /*
+node: N
+node with value: N : value(type)
+edge: --
+named edge: -[name]-
+arc: --> or <--
+name arc: -[name]-> or <-[name]-
 
-o -- neuroshok.com (web_page : page)
-o -- /home/ads (explorer_page : page)
-  |
-  o -- 5 (int)   --o
-  |                | // <int, int> refused
-  o -- 7 (int)   --o
+G --> N : neuroshok.com (web_page : page)
+G --> N : /home/ads (explorer_page : page)
+      |
+      o --> N: 5 (int) ---------------- o --------- o
+      |                                 |           |
+      o --> N: 7 (int) o <-[zeta arc]-- o           |
+      |                                             |
+      o -[custom arc]-> N: 9(int) o -[custom edge]- o
 
 */

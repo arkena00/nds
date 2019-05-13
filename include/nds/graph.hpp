@@ -1,84 +1,64 @@
-#include <iostream>
-#include <variant>
+#ifndef INCLUDE_NDS_GRAPH_HPP_NDS
+#define INCLUDE_NDS_GRAPH_HPP_NDS
+
+#include <nds/graph/edge.hpp>
+#include <nds/graph/node.hpp>
+
+#include <nds/cx/for_each.hpp>
+#include <nds/cx/index_of.hpp>
+#include <nds/cx/type_str.hpp>
+
+#include <tuple>
 #include <vector>
 
 namespace nds
 {
-    template<class...> struct pack;
+    template<class... Edges>
+    struct graph_edges{};
 
-    template<class Source, class Target>
-    struct edge
+    template<class... Types>
+    struct graph_types{};
+
+    template<class GT, class GE>
+    struct graph{};
+
+    template<class... Ts, class... Us, class... Vs>
+    struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
     {
-        edge(Source* s, Target* t) : source{s}, target{t} {}
-
-        Source* source;
-        Target* target;
-    };
-
-    struct node_base
-    {
-        int id = 0;
-    };
-
-    template<class T>
-    class node : public node_base
-    {
-        T value_;
-
     public:
-        node(T&& v)
-            : value_{ std::move(v) }
-        {}
+        template<class T>
+        using node_ptr = std::unique_ptr<node<T>>;
 
-        auto get() { return value_; }
-    };
+        using edges_type = nds::graph_edges<nds::edge<Us, Vs>...>;
 
-    template<class T, class T2>
-    struct graph
-    {
-        using types = nds::pack<T, T2>;
-
-        template<class U>
-        node<U>* add(U target, node_base* source = nullptr)
-        {
-            node<U> target_node = node<U>{ std::move(target) };
-            nodes_.push_back(std::make_unique<node<U>>(std::move(target_node)));
-            node_base* last_node = nodes_.back().get();
-            //edges_.emplace_back(nds::edge<node_base, node_base>{ source, last_node });
-            return static_cast<node<U>*>(last_node);
-        }
-
-        template<class Source, class Target>
-        void connect(Source s, Target t)
-        {
-            edges_.push_back(nds::edge<Source, Target>(s, t));
-        }
-
-        const auto& nodes()
-        {
-            return nodes_;
-        }
+        using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;
+        using edge_container_type = std::tuple<std::vector<nds::edge<nds::node<Us>, nds::node<Vs>>>...>;
 
         template<class T>
-        auto targets(node<T>* source = nullptr)
-        {
-            std::vector<node<T>*> res;
-/*
-            for (const nds::edge<node<T>, node<T>>& edge : edges_)
-            {
-                std::cout << "\n_" << edge.source << " " << edge.target;
-                if (edge.source == source) res.push_back(edge.target);
-            }*/
+        node<T>* add(T v);
 
-            return res;
-        }
+        template<class... Node_types>
+        auto& nodes();
 
+        template<class F>
+        auto edges(F&& f);
+        template<class Edges, class F>
+        auto edges(F&& f);
 
-        auto root() { return root_; }
+        template<class Source, class Target>
+        void connect(Source* s, Target* t);
+        template<class T>
+        void connect(int s, int t);
 
-        node<T>* root_ = nullptr;
-        std::tuple<>
-        std::tuple<std::vector<std::unique_ptr<node<T>>>> nodes_;
-        std::vector<nds::edge<node<T>, node<T>>> edges_;
+        template<class Source>
+        void targets(Source* source);
+
+    private:
+        node_container_type data_;
+        edge_container_type edges_;
     };
 } // nds
+
+#include "graph.tpp"
+
+#endif // INCLUDE_NDS_GRAPH_HPP_NDS
