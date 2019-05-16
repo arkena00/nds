@@ -16,20 +16,40 @@ namespace nds
 int main()
 {
     using Edges = nds::graph_edges<
-    nds::edge<int, int>
-    >;
+            nds::edge<int, char>,
+            nds::edge<int, int>
+            >;
 
-    using Types = nds::graph_types<int>;
+    using Types = nds::graph_types<int, char, std::string>;
 
     nds::graph<Types, Edges> g;
+    auto n1 = g.add<int>(12);
+    auto n2 = g.add<int>(15);
+    auto n3 = g.add<char>(97);
+    auto n4 = g.add<char>(98);
 
-    nds::stdio::write("azeazeaze");
+    g.connect(n1, n4); // int char
+    g.connect(n1, n2); // int int
+    g.connect(n2, n3); // int char
 
-    auto res = nds::encoders::dot<>::encode<std::string>(g);
+    //nds::stdio::write("azeazeaze");
+
+    auto output = nds::encoders::dot<>::encode<std::string>(g);
+    std::cout << output;
+
+
     //nds::encoders::dot<>::encode<nds::file>(g, "file");
     //nds::encoders::dot<>::encode<nds::stdio>(g);
 
-    std::cout << res;
+    /*
+    nds::encoders::graph ge;
+    nds::encoders::zip z{ "lz77" };
+
+    std::string output;
+    g >> ge >> zip >> output;
+*/
+
+
 
     /*
     nds::encoders::dot<nds::io_systems::container<std::string>> dot;

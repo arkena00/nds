@@ -15,6 +15,11 @@ namespace nds
 
     private:
         T value_;
+
+    public:
+        int targets_count = 0;
+        int counter = 0;
+
     };
 } // nds
 

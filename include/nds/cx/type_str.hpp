@@ -5,6 +5,8 @@
     #include <cxxabi.h>
 #endif
 
+#include <string>
+
 namespace nds::cx
 {
     template<class T>
