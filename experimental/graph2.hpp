@@ -1,8 +1,7 @@
-#ifndef INCLUDE_NDS_GRAPH_HPP_NDS
-#define INCLUDE_NDS_GRAPH_HPP_NDS
+#ifndef INCLUDE_NDS_GRAPH2_HPP_NDS
+#define INCLUDE_NDS_GRAPH2_HPP_NDS
 
 #include <nds/graph/edge.hpp>
-#include <nds/graph/node.hpp>
 
 #include <nds/cx/for_each.hpp>
 #include <nds/cx/index_of.hpp>
@@ -14,6 +13,22 @@
 
 namespace nds
 {
+    template<class T>
+    struct node
+    {
+        virtual T& get() = 0;
+    };
+
+    template<class T, class Base = T>
+    struct basic_node : node<Base>
+    {
+        template<class... Us>
+        basic_node(Us&&... us) : value_{ std::forward<Us>(us)... } {}
+
+        T& get() { return value_; }
+        T value_;
+    };
+
     template<class... Edges>
     struct graph_edges{};
 
@@ -62,33 +77,45 @@ namespace nds
             using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;
             using edge_container_type = std::tuple<std::vector<nds::edge<node_type<Us>, node_type<Vs>>>...>;
 
-            template<class T>
-            node_type<T>* add(T v);
-            template<class T>
-            node_type<T>* add(T v, node_type<T>*);
+            struct internal
+            {
+                template<class Base, class T>
+                struct base_type { using type = Base; };
 
-            template<class F>
-            void nodes(F&& f) const;
-            template<class Nodes, class F>
-            void nodes(F&& f) const;
+                template< class T>
+                struct base_type<void, T> { using type = T; };
+            };
 
-            template<class F>
-            void edges(F&& f) const;
-            template<class Edges, class F>
-            void edges(F&& f) const;
+
+            //! T type to store as node<T>, T must exists in the graph
+            //! Base base type of T to store as node<Base> if T is not in the graph
+            template<class B = void, class T>
+            auto add(T v)
+            {
+                using Base = typename internal::base_type<B, T>::type;
+
+                constexpr int index = cx::index_of<std::vector<node_ptr<Base>>, node_container_type>::value;
+
+                auto target_node = basic_node<T, Base>{ std::move(v) };
+                auto ptr = std::make_unique<basic_node<T, Base>>(std::move(target_node));
+                auto last_node = ptr.get();
+
+                std::get<index>(nodes_).emplace_back(std::move(ptr));
+
+                return last_node;
+            }
+
             
-            template<class Source, class Target>
-            void connect(Source* s, Target* t);
-            template<class T>
-            void connect(int s, int t);
+            template<class T, class U>
+            void connect(node<T>* source, node<U>* target)
+            {
 
-            template<class Source, class F>
-            void targets(Source* source, F&& f);
-            
-            std::size_t count_nodes();
-            std::size_t count_edges();
+            }
+
 
         public:
+            //graph_storage<graph_storage_matrix> storage_;
+
             node_container_type nodes_;
             edge_container_type edges_;
         };
@@ -98,6 +125,6 @@ namespace nds
     using graph = typename internal::graph_trait<Ts...>::type;
 } // nds
 
-#include "graph.tpp"
 
-#endif // INCLUDE_NDS_GRAPH_HPP_NDS
+
+#endif // INCLUDE_NDS_GRAPH2_HPP_NDS

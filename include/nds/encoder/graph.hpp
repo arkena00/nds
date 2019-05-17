@@ -42,9 +42,9 @@ namespace nds
                 input.edges([&output](auto&& edge)
                 {
                     std::string source_id = std::to_string(reinterpret_cast<intptr_t>(edge.source));
-                    std::string source_data = source_id + " [label=\"" + std::to_string(edge.source->get())  + " (" + nds::cx::type_str<decltype(edge.source->get())>() + ")\"];\n";
+                    std::string source_data = source_id + " [label=\"" + std::to_string(reinterpret_cast<intptr_t>(edge.source))  + " (" + nds::cx::type_str<decltype(edge.source->get())>() + ")\"];\n";
                     std::string target_id = std::to_string(reinterpret_cast<intptr_t>(edge.target));
-                    std::string target_data = target_id + " [label=\"" + std::to_string(edge.target->get()) + " (" + nds::cx::type_str<decltype(edge.target->get())>() + ")\"];\n";
+                    std::string target_data = target_id + " [label=\"" + std::to_string(reinterpret_cast<intptr_t>(edge.target)) + " (" + nds::cx::type_str<decltype(edge.target->get())>() + ")\"];\n";
 
                     nds::append(output
                     , source_id

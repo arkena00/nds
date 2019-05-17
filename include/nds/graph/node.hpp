@@ -1,6 +1,8 @@
 #ifndef INCLUDE_NDS_GRAPH_NODE_HPP_NDS
 #define INCLUDE_NDS_GRAPH_NODE_HPP_NDS
 
+#include <utility>
+
 namespace nds
 {
     template<class T>
@@ -11,7 +13,7 @@ namespace nds
             : value_{ std::move(v) }
         {}
 
-        auto get() { return value_; }
+        T& get() { return value_; }
 
     private:
         T value_;

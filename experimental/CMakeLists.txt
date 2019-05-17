@@ -18,3 +18,6 @@ exp_make(encoder)
 exp_make(graph)
 exp_make(graph_type)
 exp_make(graph_bfs)
+
+
+exp_make(graph2)

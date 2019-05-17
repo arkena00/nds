@@ -1,40 +1,57 @@
 #include <nds/graph.hpp>
 
 #include <string>
-
+#include <nds/encoder/graph.hpp>
 
 struct movie { std::string title; };
 struct serie { std::string name; };
 
 struct movie_interface {  };
 
-struct page { std::string name; };
-struct web_page : page { std::string url; };
-struct explorer_page : page { std::string path; };
+struct page { page(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
+struct web_page : public page { using page::page; std::string url; std::string info() override {  return name + "\\n" + url; } };
+struct explorer_page : public page { using page::page; std::string path; std::string info() override {  return name + "\\n" + path; } };
 
-
+namespace std
+{
+    std::string to_string(page& p)
+    {
+        return p.info();
+    }
+}
 
 int main()
 {
-    nds::graph<::page, int> g;
+    //nds::graph<::page, graph_params<wrapping_type<std::unique_ptr>>> g;
+    nds::graph<::page> g;
 
-    ::web_page wp;
+    //graph<page, nds::graph_params::unique>
+
+
+    ::web_page wp{"a"};
     wp.name = "web_page";
-    wp.url = "aze";
+    wp.url = "neuroshok.com";
 
-    ::explorer_page ep;
+
+
+    ::explorer_page ep{"r"};
     ep.name = "explorer_page";
 
-    auto root = g.add(web_page{"root_page"});
-    g.add(web_page{"web_child"}, root);
-    g.add(explorer_page{"explorer_child"}, root);
-    g.add(5, root);
+    g.add(page("a"));
+
+    /*
+    auto root = g.add<::page>(web_page{"root_page"});
+    auto wc = g.add<::page>(web_page{"web_child"}, root);
+    g.add<::page>(explorer_page{"explorer_child"}, root);
+    g.add<page>(wp, wc);*/
+    //g.add(5, root);
 
 
-    for (auto&& node : g.nodes())
-    {
-        std::cout << "\n__" << node->id;
-    }
+    //g.nodes([](auto&& node){ std::cout << "\nnode " << node->get()->info() << " | " << node->get()->info(); });
+
+    nds::encoders::dot<>::encode<nds::console>(g);
+
+
 
 
     /*
