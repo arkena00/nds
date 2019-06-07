@@ -1,6 +1,7 @@
 #ifndef INCLUDE_NDS_GRAPH_HPP_NDS
 #define INCLUDE_NDS_GRAPH_HPP_NDS
 
+#include <nds/graph/trait.hpp>
 #include <nds/graph/edge.hpp>
 #include <nds/graph/node.hpp>
 
@@ -14,40 +15,11 @@
 
 namespace nds
 {
-    template<class... Edges>
-    struct graph_edges{};
-
-    template<class... Types>
-    struct graph_types{};
-
-    template<class... Params>
-    struct graph_params{};
-
     namespace internal
     {
-        template<class...>
-        struct graph;
-
-        template<class...>
-        struct graph_trait;
-
-        // graph<T>
-        template<class T>
-        struct graph_trait<T>
-        {
-            using type = graph<nds::graph_types<T>, nds::graph_edges<nds::edge<T, T>>>;
-        };
-
-        // graph<Graph_types, Graph_edges>
-        template<class... Ts, class... Us, class... Vs>
-        struct graph_trait<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
-        {
-            using type = graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>;
-        };
-
 
         template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>> //: nds::concept<nds::concepts::graph>
+        struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storage::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
         public:
             template<class T>
@@ -62,20 +34,28 @@ namespace nds
             using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;
             using edge_container_type = std::tuple<std::vector<nds::edge<node_type<Us>, node_type<Vs>>>...>;
 
-            template<class T>
-            node_type<T>* add(T v);
+            template<class B = void, class T>
+            auto add(T v);
+
+            template<class Source, class Target>
+            void connect(node<Source>* source, node<Target>* target);
+
+            template<class F>
+            void edges(F&& f) const;
+            template<class Edges, class F>
+            void edges(F&& f) const;
+
+            /*
             template<class T>
             node_type<T>* add(T v, node_type<T>*);
+
 
             template<class F>
             void nodes(F&& f) const;
             template<class Nodes, class F>
             void nodes(F&& f) const;
 
-            template<class F>
-            void edges(F&& f) const;
-            template<class Edges, class F>
-            void edges(F&& f) const;
+
             
             template<class Source, class Target>
             void connect(Source* s, Target* t);
@@ -87,11 +67,13 @@ namespace nds
             
             std::size_t count_nodes();
             std::size_t count_edges();
+             */
 
         public:
             node_container_type nodes_;
             edge_container_type edges_;
         };
+
     } // internal
 
     template<class... Ts>

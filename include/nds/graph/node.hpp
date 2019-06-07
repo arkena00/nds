@@ -9,19 +9,20 @@ namespace nds
     class node
     {
     public:
-        node(T&& v)
-            : value_{ std::move(v) }
-        {}
+        virtual T& get() = 0;
+    };
+
+    template<class T, class Base = T>
+    class basic_node : public node<Base>
+    {
+    public:
+        template<class... Us>
+        basic_node(Us&&... us) : value_{ std::forward<Us>(us)... } {}
 
         T& get() { return value_; }
 
     private:
         T value_;
-
-    public:
-        int targets_count = 0;
-        int counter = 0;
-
     };
 } // nds
 
