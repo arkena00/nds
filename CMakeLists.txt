@@ -16,6 +16,9 @@ file(GLOB_RECURSE NDS_SOURCES
 add_library(lib_nds OBJECT ${NDS_SOURCES})
 target_include_directories(lib_nds PUBLIC "include")
 
+set(NDB_ENGINE_SQLITE ON)
+add_subdirectory(third_party/ndb)
+
 add_subdirectory(experimental)
 add_subdirectory(benchmark)
 

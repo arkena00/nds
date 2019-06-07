@@ -4,3 +4,6 @@
 [submodule "third_party/googletest"]
 	path = third_party/googletest
 	url = https://github.com/google/googletest.git
+[submodule "third_party/ndb"]
+	path = third_party/ndb
+	url = https://github.com/ads00/ndb.git
