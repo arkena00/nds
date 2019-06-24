@@ -2,8 +2,10 @@
 #define INCLUDE_NDS_ENCODER_GRAPH_HPP_NDS
 
 #include <nds/encoder.hpp>
-#include <sstream>
+
 #include <cassert>
+#include <iostream>
+#include <sstream>
 
 namespace nds
 {

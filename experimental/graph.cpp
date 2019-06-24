@@ -1,6 +1,8 @@
 #include <nds/graph.hpp>
 #include <nds/encoder/graph.hpp>
 
+#include <nds/graph/ndb_storage.hpp>
+
 
 struct page { page(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 struct web_page : public page { using page::page; std::string url; std::string info() override {  return name + "\\n" + url; } };
@@ -8,9 +10,19 @@ struct explorer_page : public page { using page::page; std::string path; std::st
 
 int main()
 {
-    nds::graph<nds::graph_storage::tuple_vector, page> g;
 
-    nds::graph<nds::graph_storage::ndb, page> gd;
+
+    nds::graph<page> g;
+
+        using Edges = nds::graph_edges<
+        nds::edge<page, page>
+        >;
+
+    using Types = nds::graph_types<page>;
+
+    nds::graph<Types, Edges, nds::graph_storages::ndb> gd;
+
+    nds::graph<int, char, bool> gg;
 
     ::web_page wp{"web_page"};
     wp.url = "neuroshok.com";

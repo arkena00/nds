@@ -14,10 +14,12 @@ namespace nds
     template<class... Params>
     struct graph_params{};
 
-    namespace graph_storage
+    namespace graph_storages
     {
         struct tuple_vector;
         struct ndb;
+
+        using default_storage = tuple_vector;
     } // graph_storages
 
     namespace internal
@@ -25,14 +27,18 @@ namespace nds
         template<class...>
         struct graph;
 
-        template<class Storage, class...>
-        struct graph_trait;
+        template<class... Ts>
+        struct graph_trait
+        {
+            // todo: generate all edges
+            using type = graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Ts, Ts>...>, graph_storages::default_storage>;
+        };
 
         // graph<T>
-        template<class Storage, class T>
-        struct graph_trait<Storage, T>
+        template<class T>
+        struct graph_trait<T>
         {
-            using type = graph<nds::graph_types<T>, nds::graph_edges<nds::edge<T, T>>, Storage>;
+            using type = graph<nds::graph_types<T>, nds::graph_edges<nds::edge<T, T>>, graph_storages::default_storage>;
         };
 
         // graph<Graph_types, Graph_edges>

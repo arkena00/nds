@@ -19,7 +19,7 @@ namespace nds
     {
 
         template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storage::tuple_vector> //: nds::concept<nds::concepts::graph>
+        struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
         public:
             template<class T>
