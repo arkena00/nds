@@ -36,37 +36,38 @@ namespace nds
 
             template<class B = void, class T>
             auto add(T v);
+            template<class B = void, class T, class Source>
+            auto add(T v, node_type<Source>*);
 
             template<class Source, class Target>
-            void connect(node<Source>* source, node<Target>* target);
-
-            template<class F>
-            void edges(F&& f) const;
-            template<class Edges, class F>
-            void edges(F&& f) const;
-
-            /*
-            template<class T>
-            node_type<T>* add(T v, node_type<T>*);
-
+            void connect(node_type<Source>* source, node_type<Target>* target);
 
             template<class F>
             void nodes(F&& f) const;
             template<class Nodes, class F>
             void nodes(F&& f) const;
 
+            template<class F>
+            void edges(F&& f) const;
+            template<class Edges, class F>
+            void edges(F&& f) const;
 
-            
+            template<class Target, class F>
+            void sources(node_type<Target>* target, F&& f);
+
+            template<class Source, class F>
+            void targets(node_type<Source>* source, F&& f);
+
+
+
+            std::size_t count_nodes();
+            std::size_t count_edges();
+            /*
+
             template<class Source, class Target>
             void connect(Source* s, Target* t);
             template<class T>
             void connect(int s, int t);
-
-            template<class Source, class F>
-            void targets(Source* source, F&& f);
-            
-            std::size_t count_nodes();
-            std::size_t count_edges();
              */
 
         public:

@@ -36,16 +36,21 @@ int main()
     ::node n{ "web_node" };
 
     auto p0 = g.add(std::move(n));
-    auto p1 = g.add<page>(std::move(wp));
-    auto p2 = g.add<page>(std::move(ep));
+    auto p1 = g.add<page>(std::move(wp), p0);
+    auto p2 = g.add<page>(std::move(ep), p0);
 
+    g.connect(p1, p2);
+    g.connect(p2, p1);
+/*
     g.connect(p0, p1);
     g.connect(p0, p2);
-    g.connect(p1, p2);
+    g.connect(p1, p2);*/
 
-    //g.nodes([](auto&& node){ std::cout << "\nnode " << node->get()->info() << " | " << node->get()->info(); });
+    //g.nodes<nds::graph_types<page>>([](auto&& node){ std::cout << "\nnode " << node->get().name; });
 
-    nds::encoders::dot<>::encode<nds::console>(g);
+    g.sources(p1, [](auto&& node) {std::cout << "\nnode " << node->get().name; });
+
+    //nds::encoders::dot<>::encode<nds::console>(g);
 
 }
 
