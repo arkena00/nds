@@ -3,26 +3,29 @@
 
 #include <nds/graph/ndb_storage.hpp>
 
+struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 
-struct page { page(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
-struct web_page : public page { using page::page; std::string url; std::string info() override {  return name + "\\n" + url; } };
-struct explorer_page : public page { using page::page; std::string path; std::string info() override {  return name + "\\n" + path; } };
+struct page { page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
+struct web_page : public page { using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
+struct explorer_page : public page { using page::page; std::string path; std::string info() const override {  return name + "\\n" + path; } };
+
+namespace nds::encoders
+{
+    template<>
+    template<>
+    std::string dot<void>::node_name(const page& p)
+    {
+        return p.info();
+    }
+} // nds::encoders
+
 
 int main()
 {
+    using Edges = nds::graph_edges<nds::edge<page, page>, nds::edge<::node, page>, nds::edge<page, ::node>>;
+    using Types = nds::graph_types<page, node>;
 
-
-    nds::graph<page> g;
-
-        using Edges = nds::graph_edges<
-        nds::edge<page, page>
-        >;
-
-    using Types = nds::graph_types<page>;
-
-    nds::graph<Types, Edges, nds::graph_storages::ndb> gd;
-
-    nds::graph<int, char, bool> gg;
+    nds::graph<Types, Edges> g;
 
     ::web_page wp{"web_page"};
     wp.url = "neuroshok.com";
@@ -30,9 +33,14 @@ int main()
     ::explorer_page ep{"explorer_page"};
     ep.path = "/home";
 
+    ::node n{ "web_node" };
+
+    auto p0 = g.add(std::move(n));
     auto p1 = g.add<page>(std::move(wp));
     auto p2 = g.add<page>(std::move(ep));
 
+    g.connect(p0, p1);
+    g.connect(p0, p2);
     g.connect(p1, p2);
 
     //g.nodes([](auto&& node){ std::cout << "\nnode " << node->get()->info() << " | " << node->get()->info(); });

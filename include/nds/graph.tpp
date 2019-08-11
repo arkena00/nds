@@ -1,6 +1,6 @@
 #include <nds/graph/node.hpp>
 #include <memory>
-
+struct node;
 namespace nds::internal
 {
     //! T type to store as node<T>, T must exists in the graph
