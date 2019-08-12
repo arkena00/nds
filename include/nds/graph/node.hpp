@@ -20,7 +20,7 @@ namespace nds
         template<class... Us>
         basic_node(Us&&... us) : value_{ std::forward<Us>(us)... } {}
 
-        unsigned int id() const { return reinterpret_cast<uintptr_t>(&value_); }
+       auto id() const { return reinterpret_cast<uintptr_t>(&value_); }
         T& get() { return value_; }
 
     private:

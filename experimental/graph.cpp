@@ -2,6 +2,7 @@
 #include <nds/encoder/graph.hpp>
 
 #include <nds/graph/ndb_storage.hpp>
+#include <nds/algorithm/graph/find.hpp>
 
 struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 
@@ -18,6 +19,7 @@ namespace nds::encoders
         return p.info();
     }
 } // nds::encoders
+
 
 
 int main()
@@ -48,7 +50,9 @@ int main()
 
     //g.nodes<nds::graph_types<page>>([](auto&& node){ std::cout << "\nnode " << node->get().name; });
 
-    g.sources(p1, [](auto&& node) {std::cout << "\nnode " << node->get().name; });
+    nds::algorithm::graph::find(g, [](auto&& found_node){ std::cout << found_node->get().name; }
+    , [](auto&& test_node){ return test_node->get().name == "web_node"; });
+
 
     //nds::encoders::dot<>::encode<nds::console>(g);
 

@@ -28,8 +28,8 @@ namespace nds
             template<class T>
             using node_ptr = std::unique_ptr<node_type<T>>;
 
-            using edges_type = nds::graph_edges<edge<Us, Vs>...>;
             using nodes_type = nds::graph_types<Ts...>;
+            using edges_type = nds::graph_edges<edge<Us, Vs>...>;
 
             using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;
             using edge_container_type = std::tuple<std::vector<nds::edge<node_type<Us>, node_type<Vs>>>...>;
@@ -58,10 +58,11 @@ namespace nds
             template<class Source, class F>
             void targets(node_type<Source>* source, F&& f);
 
+            static constexpr std::size_t count_nodes_type();
+            static constexpr std::size_t count_edges_type();
 
-
-            std::size_t count_nodes();
-            std::size_t count_edges();
+            std::size_t count_nodes() const;
+            std::size_t count_edges() const;
             /*
 
             template<class Source, class Target>

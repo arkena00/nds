@@ -148,15 +148,28 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::count_nodes()
+    ::count_nodes() const
     {
         return std::apply([&](auto&&... vectors) { return (vectors.size() + ...); }, nodes_);
     }
     template<class... Ts, class... Us, class... Vs>
     std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::count_edges()
+    ::count_edges() const
     {
         return std::apply([&](auto&&... vectors) { return (vectors.size() + ...); }, edges_);
+    }
+
+    template<class... Ts, class... Us, class... Vs>
+    constexpr std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::count_nodes_type()
+    {
+        return sizeof...(Ts);
+    }
+    template<class... Ts, class... Us, class... Vs>
+    constexpr std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::count_edges_type()
+    {
+        return sizeof...(edge<Us, Vs>);
     }
 
     /*
