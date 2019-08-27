@@ -5,10 +5,14 @@
 
 namespace nds
 {
+    class node_base{};
+
     template<class T>
-    class node
+    class node : node_base
     {
     public:
+        using base_type = T;
+
         virtual unsigned int id() const = 0;
         virtual T& get() = 0;
     };
@@ -17,10 +21,12 @@ namespace nds
     class basic_node : public node<Base>
     {
     public:
+        using type = T;
+
         template<class... Us>
         basic_node(Us&&... us) : value_{ std::forward<Us>(us)... } {}
 
-       auto id() const { return reinterpret_cast<uintptr_t>(&value_); }
+       unsigned int id() const { return reinterpret_cast<uintptr_t>(&value_); }
         T& get() { return value_; }
 
     private:

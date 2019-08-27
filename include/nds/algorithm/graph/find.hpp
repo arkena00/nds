@@ -9,7 +9,7 @@ namespace nds::algorithm::graph
     auto find(Graph& graph, On_match&& on_match, Predicat&& predicat)
     {
         bool found = false;
-        nds::cx::for_each<Graph::nodes_type>([&graph, &predicat, &found, &on_match](auto&& nt)
+        nds::cx::for_each<typename Graph::nodes_type>([&graph, &predicat, &found, &on_match](auto&& nt)
         {
             using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
 

@@ -6,8 +6,8 @@
 
 struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 
-struct page { page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
-struct web_page : public page { using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
+struct page {  page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
+struct web_page : public page { web_page(web_page&&) = delete; using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
 struct explorer_page : public page { using page::page; std::string path; std::string info() const override {  return name + "\\n" + path; } };
 
 namespace nds::encoders
@@ -38,11 +38,11 @@ int main()
     ::node n{ "web_node" };
 
     auto p0 = g.add(std::move(n));
-    auto p1 = g.add<page>(std::move(wp), p0);
-    auto p2 = g.add<page>(std::move(ep), p0);
+    auto p1 = g.emplace<page, web_page>( p0, "test" );
+    //auto p2 = g.add<page>(std::move(ep), p0);
 
-    g.connect(p1, p2);
-    g.connect(p2, p1);
+    //g.connect(p1, p2);
+    //g.connect(p2, p1);
 /*
     g.connect(p0, p1);
     g.connect(p0, p2);

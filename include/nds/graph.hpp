@@ -15,13 +15,23 @@
 
 namespace nds
 {
+    template<int N, typename... Ts> using argn =
+    typename std::tuple_element<N, std::tuple<Ts...>>::type;
+
     namespace internal
     {
+                    template<class... Args>
+            using disable_node = std::enable_if_t<
+            !std::is_base_of_v<node_base, std::remove_pointer_t<std::decay_t<argn<0, Args...>>>>
+            , bool
+            >;
 
         template<class... Ts, class... Us, class... Vs>
         struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
         public:
+
+
             template<class T>
             using node_type = node<T>;
 
@@ -38,6 +48,11 @@ namespace nds
             auto add(T v);
             template<class B = void, class T, class Source>
             auto add(T v, node_type<Source>*);
+
+            template<class B, class T, class... Args, disable_node<Args...> = 0>
+            auto emplace(Args&&... args);
+            template<class B, class T, class Source, class... Args>
+            auto emplace(node_type<Source>* source, Args&&... args);
 
             template<class Source, class Target>
             void connect(node_type<Source>* source, node_type<Target>* target);

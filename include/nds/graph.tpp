@@ -35,6 +35,31 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
+    template<class B, class T, class... Args, disable_node<Args...>>
+    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::emplace(Args&&... args)
+    {
+        constexpr int type_index = cx::index_of<std::vector<node_ptr<B>>, node_container_type>::value;
+
+        auto ptr = std::make_unique<basic_node<T, B>>( std::forward<Args>(args)... );
+        auto last_node = ptr.get();
+
+        std::get<type_index>(nodes_).emplace_back(std::move(ptr));
+
+        return last_node;
+    }
+
+    template<class... Ts, class... Us, class... Vs>
+    template<class B, class T, class Source, class... Args>
+    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::emplace(node_type<Source>* source, Args&&... args)
+    {
+        auto last_node = emplace<B, T>(std::forward<Args>(args)...);
+        if (source != nullptr) connect(source, last_node);
+        return last_node;
+    }
+
+    template<class... Ts, class... Us, class... Vs>
     template<class Source, class Target>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::connect(node_type<Source>* source, node_type<Target>* target)
@@ -169,7 +194,7 @@ namespace nds::internal
     constexpr std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::count_edges_type()
     {
-        return sizeof...(edge<Us, Vs>);
+        return 0;//sizeof...(edge<Us..., Vs...>);
     }
 
     /*
