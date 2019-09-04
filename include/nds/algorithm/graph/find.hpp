@@ -5,28 +5,25 @@
 
 namespace nds::algorithm::graph
 {
-    template<class Graph, class On_match, class Predicat>
-    auto find(Graph& graph, On_match&& on_match, Predicat&& predicat)
+    //! Callback is called while predicate is true
+    //! Return when predicate is false
+    template<class Graph, class Callback, class Predicate>
+    auto find(Graph& graph, Callback&& callback, Predicate&& predicate)
     {
-        bool found = false;
-        nds::cx::for_each<typename Graph::nodes_type>([&graph, &predicat, &found, &on_match](auto&& nt)
+        bool predicate_value = true;
+        nds::cx::for_each<typename Graph::nodes_type>([&graph, &predicate, &predicate_value, &callback](auto&& nt)
         {
             using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
 
-            auto loop_graph_type = [&predicat, &found, &on_match](auto&& vector)
+            auto loop_graph_type = [&predicate, &predicate_value, &callback](auto&& vector)
             {
                 using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
                 if constexpr (std::is_same_v<input_node_type, graph_node_type>)
                 {
-                    if (found) return;
                     for (auto&& node : vector)
                     {
-                        if (predicat(node.get()))
-                        {
-                            found = true;
-                            on_match(node.get());
-                            return;
-                        }
+                        if (!predicate(node.get())) return;
+                        callback(node.get());
                     }
                 }
             };

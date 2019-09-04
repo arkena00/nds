@@ -51,7 +51,7 @@ int main()
     //g.nodes<nds::graph_types<page>>([](auto&& node){ std::cout << "\nnode " << node->get().name; });
 
     nds::algorithm::graph::find(g, [](auto&& found_node){ std::cout << found_node->get().name; }
-    , [](auto&& test_node){ return test_node->get().name == "web_node"; });
+    , [](auto&& test_node){ return test_node->get().name == "test"; });
 
 
     //nds::encoders::dot<>::encode<nds::console>(g);
