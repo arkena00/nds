@@ -50,8 +50,16 @@ int main()
 
     //g.nodes<nds::graph_types<page>>([](auto&& node){ std::cout << "\nnode " << node->get().name; });
 
-    nds::algorithm::graph::find(g, [](auto&& found_node){ std::cout << found_node->get().name; }
-    , [](auto&& test_node){ return test_node->get().name == "test"; });
+    nds::algorithm::graph::find_if(g, [](auto&& node){ return node->get().name == "web_node"; }
+    , [](auto&& node)
+    {
+        std::cout << node->get().name << "\n";
+    });
+
+    nds::algorithm::graph::for_each(g, [](auto&& node)
+    {
+        std::cout << "\n" << node->get().name;
+    });
 
 
     //nds::encoders::dot<>::encode<nds::console>(g);
