@@ -13,6 +13,7 @@ namespace nds
     public:
         using base_type = T;
 
+        virtual ~node() = default;
         virtual unsigned int id() const = 0;
         virtual T& get() = 0;
     };
