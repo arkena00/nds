@@ -1,5 +1,5 @@
-#ifndef INCLUDE_NDS_ALGORITHM_GRAPH_FIND_HPP_NDS
-#define INCLUDE_NDS_ALGORITHM_GRAPH_FIND_HPP_NDS
+#ifndef INCLUDE_NDS_ALGORITHM_GRAPH_HPP_NDS
+#define INCLUDE_NDS_ALGORITHM_GRAPH_HPP_NDS
 
 #include <nds/graph.hpp>
 
@@ -56,7 +56,12 @@ namespace nds::algorithm::graph
             std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
         });
     }
+
+    template<class Graph, class Callback>
+    void source_path(Graph& graph, typename Graph::node_type node, Callback&& callback)
+    {
+
+    }
 } // nds::algorithm::graph
 
-
-#endif // INCLUDE_NDS_ALGORITHM_GRAPH_FIND_HPP_NDS
+#endif // INCLUDE_NDS_ALGORITHM_GRAPH_HPP_NDS
