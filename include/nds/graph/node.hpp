@@ -25,7 +25,7 @@ namespace nds
         using type = T;
 
         template<class... Us>
-        node(Us&&... us) : node( typename std::is_constructible<T, node<T>*, Us...>::type{}, std::forward<Us>(us)...) {}
+        basic_node(Us&&... us) : basic_node( typename std::is_constructible<T, basic_node<T>*, Us...>::type{}, std::forward<Us>(us)...) {}
 
         auto id() const { return reinterpret_cast<uintptr_t>(&value_); }
         T& get() { return value_; }
@@ -33,11 +33,11 @@ namespace nds
     private:
         // node constructor
         template<class... Us>
-        node(std::true_type, Us&&... us) : value_{ this, std::forward<Us>(us)... } {}
+        basic_node(std::true_type, Us&&... us) : value_{ this, std::forward<Us>(us)... } {}
 
         // default constructor
         template<class... Us>
-        node(std::false_type, Us&&... us) : value_{ std::forward<Us>(us)... } {}
+        basic_node(std::false_type, Us&&... us) : value_{ std::forward<Us>(us)... } {}
 
     private:
         T value_;
