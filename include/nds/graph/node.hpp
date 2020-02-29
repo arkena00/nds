@@ -14,7 +14,7 @@ namespace nds
         using base_type = T;
 
         virtual ~node() = default;
-        virtual unsigned int id() const = 0;
+        virtual uintptr_t id() const = 0;
         virtual T& get() = 0;
     };
 
@@ -27,7 +27,7 @@ namespace nds
         template<class... Us>
         basic_node(Us&&... us) : basic_node( typename std::is_constructible<T, basic_node<T>*, Us...>::type{}, std::forward<Us>(us)...) {}
 
-        auto id() const { return reinterpret_cast<uintptr_t>(&value_); }
+        uintptr_t id() const { return reinterpret_cast<uintptr_t>(&value_); }
         T& get() { return value_; }
 
     private:
