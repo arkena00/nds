@@ -42,6 +42,23 @@ namespace nds
     private:
         T value_;
     };
+
+    template<class T>
+    class node_ptr
+    {
+    public:
+        node_ptr(nds::node<T>* ptr = nullptr)
+            : node_{ ptr }
+        {}
+
+        auto id() const { return node_->id(); }
+
+        operator bool() { return node_ != nullptr; }
+        T* operator->() { return &node_->get(); }
+
+    private:
+        nds::node<T>* node_;
+    };
 } // nds
 
 #endif // INCLUDE_NDS_GRAPH_NODE_HPP_NDS

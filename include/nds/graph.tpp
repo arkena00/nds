@@ -13,7 +13,7 @@ namespace nds::internal
         // Base = T if Base is not specified
         using Base = std::conditional_t<std::is_same_v<B, void>, T, B>;
 
-        constexpr int type_index = cx::index_of<std::vector<node_ptr<Base>>, node_container_type>::value;
+        constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<Base>>, node_container_type>::value;
 
         auto target_node = basic_node<T, Base>{ std::move(v) };
         std::unique_ptr<basic_node<T, Base>> ptr = std::make_unique<basic_node<T, Base>>(std::move(target_node));
@@ -21,16 +21,16 @@ namespace nds::internal
 
         std::get<type_index>(nodes_).emplace_back(std::move(ptr));
 
-        return last_node;
+        return node_ptr<Base>(last_node);
     }
 
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T, class Source>
     auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::add(T v, node_type<Source>* source)
+    ::add(T v, node_ptr<Source> source)
     {
         auto last_node = add<B, T>(std::move(v));
-        if (source != nullptr) connect(source, last_node);
+        connect(source, last_node);
         return last_node;
     }
 
@@ -39,36 +39,37 @@ namespace nds::internal
     auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::emplace(Args&&... args)
     {
-        constexpr int type_index = cx::index_of<std::vector<node_ptr<B>>, node_container_type>::value;
+        constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<B>>, node_container_type>::value;
 
         auto ptr = std::make_unique<basic_node<T, B>>( std::forward<Args>(args)... );
         auto last_node = ptr.get();
 
         std::get<type_index>(nodes_).emplace_back(std::move(ptr));
 
-        return last_node;
+        return node_ptr<B>(last_node);
     }
 
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T, class Source, class... Args>
     auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::emplace(node_type<Source>* source, Args&&... args)
+    ::emplace(node_ptr<Source> source, Args&&... args)
     {
         auto last_node = emplace<B, T>(std::forward<Args>(args)...);
-        if (source != nullptr) connect(source, last_node);
+        connect(source, last_node);
         return last_node;
     }
 
     template<class... Ts, class... Us, class... Vs>
     template<class Source, class Target>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::connect(node_type<Source>* source, node_type<Target>* target)
+    ::connect(node_ptr<Source> source, node_ptr<Target> target)
     {
+        if (!source || !target) return;
         // check edges
-        constexpr int type_index = cx::index_of<std::vector<edge<node_type<Source>, node_type<Target>>>, edge_container_type>::value;
+        constexpr int type_index = cx::index_of<std::vector<edge<node_ptr<Source>, node_ptr<Target>>>, edge_container_type>::value;
         // static_assert(index >= 0, "connection between U and V not allowed");
 
-        std::get<type_index>(edges_).emplace_back(edge<node_type<Source>, node_type<Target>>{ source, target });
+        std::get<type_index>(edges_).emplace_back(edge<node_ptr<Source>, node_ptr<Target>>{ source, target });
     }
 
     template<class... Ts, class... Us, class... Vs>
@@ -86,12 +87,12 @@ namespace nds::internal
     {
         nds::cx::for_each<Nodes>([&f, this](auto&& nt)
         {
-            using input_node_type = node_type<typename std::decay_t<decltype(nt)>::type>;
+            using input_node_ptr = node_ptr<typename std::decay_t<decltype(nt)>::type>;
 
             auto loop_graph_type = [&f](auto&& vector)
             {
-                using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
-                if constexpr (std::is_same_v<input_node_type, graph_node_type>)
+                using graph_node_ptr = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_ptr<T>
+                if constexpr (std::is_same_v<input_node_ptr, graph_node_ptr>)
                 {
                     for (auto&& node : vector) f(node);
                 }
@@ -117,10 +118,11 @@ namespace nds::internal
         nds::cx::for_each<Edges>([&f, this](auto&& et)
         {
             using input_raw_edge_type = typename std::decay_t<decltype(et)>::type; // nds::edge<U, V>
-            using input_edge_type = nds::edge<node_type<typename input_raw_edge_type::source_type>, node_type<typename input_raw_edge_type::target_type>>;
+            using input_edge_type = nds::edge<node_ptr<typename input_raw_edge_type::source_type>, node_ptr<typename input_raw_edge_type::target_type>>;
 
-            auto loop_edge_type = [&f](auto&& vector) {
-                using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type; // edge<node_type<U>, node_type<V>>
+            auto loop_edge_type = [&f](auto&& vector)
+            {
+                using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type; // edge<node_ptr<U>, node_ptr<V>>
                 if constexpr (std::is_same_v<input_edge_type, graph_edge_type>)
                 {
                     for (auto&& edge : vector) f(edge);
@@ -134,17 +136,16 @@ namespace nds::internal
     template<class... Ts, class... Us, class... Vs>
     template<class Target, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::sources(node_type<Target>* target, F&& f)
+    ::sources(node_ptr<Target> target, F&& f)
     {
+        if (!target) return;
         auto loop_graph_edge = [&](auto&& vector)
         {
-            using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_type<T>
+            using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_ptr<T>
 
+            for (auto&& edge : vector)
             {
-                for (auto&& node : vector)
-                {
-                    if (target->id() == node.target->id()) f(node.source);
-                }
+                if (target.id() == edge.target.id()) f(edge.source);
             }
         };
 
@@ -154,17 +155,16 @@ namespace nds::internal
     template<class... Ts, class... Us, class... Vs>
     template<class Source, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::targets(node_type<Source>* source, F&& f)
+    ::targets(node_ptr<Source> source, F&& f)
     {
+        if (!source) return;
         auto loop_graph_edge = [&](auto&& vector)
         {
-            using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_type<T>
+            using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_ptr<T>
 
+            for (auto&& edge : vector)
             {
-                for (auto&& node : vector)
-                {
-                    if (source->id() == node.source->id()) f(node.target);
-                }
+                if (source.id() == edge.source.id()) f(edge.target);
             }
         };
 
@@ -210,7 +210,7 @@ namespace nds::internal
         constexpr int index = cx::index_of<std::vector<edge<Source, Target>>, edge_container_type>::value;
         // static_assert(index >= 0, "connection between U and V not allowed");
 
-        source->targets_count++;
+        source.targets_count++;
 
         std::get<index>(edges_).emplace_back(edge<Source, Target>{ source, target });
     }
@@ -221,11 +221,11 @@ namespace nds::internal
     ::connect(int s, int t)
     {
         // check edges
-        constexpr int index = cx::index_of<std::vector<edge<node_type<T>, node_type<T>>>, edge_container_type>::value;
+        constexpr int index = cx::index_of<std::vector<edge<node_ptr<T>, node_ptr<T>>>, edge_container_type>::value;
         // static_assert(index >= 0, "connection between U and V not allowed");
-        node_type<T>* source = std::get<0>(nodes_)[s].get();
-        node_type<T>* target = std::get<0>(nodes_)[t].get();
-        std::get<index>(edges_).emplace_back(edge<node_type<T>, node_type<T>>{ source, target });
+        node_ptr<T>* source = std::get<0>(nodes_)[s].get();
+        node_ptr<T>* target = std::get<0>(nodes_)[t].get();
+        std::get<index>(edges_).emplace_back(edge<node_ptr<T>, node_ptr<T>>{ source, target });
     }
      */
 } // nds::internal

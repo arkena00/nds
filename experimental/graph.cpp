@@ -2,7 +2,7 @@
 #include <nds/encoder/graph.hpp>
 
 #include <nds/graph/ndb_storage.hpp>
-#include <nds/algorithm/graph/find.hpp>
+#include <nds/algorithm/graph.hpp>
 
 struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 
@@ -37,18 +37,24 @@ int main()
 
     ::node n{ "web_node" };
 
-    auto p0 = g.add(std::move(n));
+    nds::node_ptr<::node> p0 = g.add(std::move(n));
     auto p1 = g.emplace<page, web_page>( p0, "test" );
-    //auto p2 = g.add<page>(std::move(ep), p0);
+    auto p2 = g.emplace<page, web_page>( p1, "test2" );
 
     //g.connect(p1, p2);
     //g.connect(p2, p1);
-/*
-    g.connect(p0, p1);
-    g.connect(p0, p2);
-    g.connect(p1, p2);*/
 
-    //g.nodes<nds::graph_types<page>>([](auto&& node){ std::cout << "\nnode " << node->get().name; });
+    //g.connect(p0, p1);
+    g.connect(p0, p2);
+    //g.connect(p1, p2);
+
+    nds::node_ptr<::page> source = nullptr;
+    g.targets(p0, [](auto&& node){ std::cout << "\nnode " << node->name; });
+
+    //nds::node_ptr<::page> source;
+
+    /*
+    nds::algorithm::graph::source_path(g, p2, [](auto&& node){ return node->get().name == "web_node"; });
 
     nds::algorithm::graph::find_if(g, [](auto&& node){ return node->get().name == "web_node"; }
     , [](auto&& node)
@@ -59,7 +65,7 @@ int main()
     nds::algorithm::graph::for_each(g, [](auto&& node)
     {
         std::cout << "\n" << node->get().name;
-    });
+    });*/
 
 
     //nds::encoders::dot<>::encode<nds::console>(g);

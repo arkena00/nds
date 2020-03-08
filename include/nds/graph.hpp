@@ -20,42 +20,40 @@ namespace nds
 
     namespace internal
     {
-                    template<class... Args>
-            using disable_node = std::enable_if_t<
-            !std::is_base_of_v<node_base, std::remove_pointer_t<std::decay_t<argn<0, Args...>>>>
-            , bool
-            >;
+        template<class... Args>
+        using disable_node = std::enable_if_t<
+        !std::is_base_of_v<node_base, std::decay_t<argn<0, Args...>>>
+        , bool
+        >;
 
         template<class... Ts, class... Us, class... Vs>
         struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
         public:
-
+            template<class T>
+            using node_ptr = nds::node_ptr<T>;
 
             template<class T>
-            using node_type = node<T>;
-
-            template<class T>
-            using node_ptr = std::unique_ptr<node_type<T>>;
+            using internal_node_ptr = std::unique_ptr<nds::node<T>>;
 
             using nodes_type = nds::graph_types<Ts...>;
             using edges_type = nds::graph_edges<edge<Us, Vs>...>;
 
-            using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;
-            using edge_container_type = std::tuple<std::vector<nds::edge<node_type<Us>, node_type<Vs>>>...>;
+            using node_container_type = std::tuple<std::vector<internal_node_ptr<Ts>>...>;
+            using edge_container_type = std::tuple<std::vector<nds::edge<node_ptr<Us>, node_ptr<Vs>>>...>;
 
             template<class B = void, class T>
             auto add(T v);
             template<class B = void, class T, class Source>
-            auto add(T v, node_type<Source>*);
+            auto add(T v, node_ptr<Source>);
 
             template<class B, class T, class... Args, disable_node<Args...> = 0>
             auto emplace(Args&&... args);
             template<class B, class T, class Source, class... Args>
-            auto emplace(node_type<Source>* source, Args&&... args);
+            auto emplace(node_ptr<Source> source, Args&&... args);
 
             template<class Source, class Target>
-            void connect(node_type<Source>* source, node_type<Target>* target);
+            void connect(node_ptr<Source> source, node_ptr<Target> target);
 
             template<class F>
             void nodes(F&& f) const;
@@ -68,10 +66,10 @@ namespace nds
             void edges(F&& f) const;
 
             template<class Target, class F>
-            void sources(node_type<Target>* target, F&& f);
+            void sources(node_ptr<Target> target, F&& f);
 
             template<class Source, class F>
-            void targets(node_type<Source>* source, F&& f);
+            void targets(node_ptr<Source> source, F&& f);
 
             static constexpr std::size_t count_nodes_type();
             static constexpr std::size_t count_edges_type();
