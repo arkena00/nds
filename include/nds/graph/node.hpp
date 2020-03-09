@@ -16,6 +16,7 @@ namespace nds
         virtual ~node() = default;
         virtual uintptr_t id() const = 0;
         virtual T& get() = 0;
+        virtual const T& get() const = 0;
     };
 
     template<class T, class Base = T>
@@ -29,6 +30,7 @@ namespace nds
 
         uintptr_t id() const { return reinterpret_cast<uintptr_t>(&value_); }
         T& get() { return value_; }
+        const T& get() const { return value_; }
 
     private:
         // node constructor
@@ -53,8 +55,18 @@ namespace nds
 
         auto id() const { return node_->id(); }
 
-        operator bool() { return node_ != nullptr; }
+        nds::node<T>* get() { return node_; }
+        const nds::node<T>* get() const { return node_; }
+
+        void reset(nds::node<T>* node = nullptr) { node_ = node; }
+
+        operator bool() const { return node_ != nullptr; }
+
+        T& operator*() { return node_->get(); }
+        const T& operator*() const { return node_->get(); }
+
         T* operator->() { return &node_->get(); }
+        const T* operator->() const { return &node_->get(); }
 
     private:
         nds::node<T>* node_;
