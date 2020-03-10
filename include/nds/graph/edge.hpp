@@ -12,7 +12,7 @@ namespace nds
         using source_type = Source;
         using target_type = Target;
 
-        edge(Source s, const Target t)
+        edge(Source s, Target t)
             : source{ std::move(s) }
             , target{ std::move(t) }
         {}

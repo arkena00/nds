@@ -60,10 +60,15 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class Source, class Target>
+    template<class Source_type, class Target_type>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::connect(node_ptr<Source> source, node_ptr<Target> target)
+    ::connect(node_ptr<Source_type> source_, node_ptr<Target_type> target_)
     {
+        using Source = std::remove_const_t<Source_type>;
+        using Target = std::remove_const_t<Target_type>;
+        node_ptr<Source> source{ const_cast<node_type<Source>*>(source_.get()) };
+        node_ptr<Target> target{ const_cast<node_type<Target>*>(target_.get()) };
+
         if (!source || !target) return;
         // check edges
         constexpr int type_index = cx::index_of<std::vector<edge<node_ptr<Source>, node_ptr<Target>>>, edge_container_type>::value;
