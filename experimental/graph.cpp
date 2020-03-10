@@ -4,7 +4,8 @@
 #include <nds/graph/ndb_storage.hpp>
 #include <nds/algorithm/graph.hpp>
 
-struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
+struct node_base { virtual std::string info() = 0; };
+struct node : node_base { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
 
 struct page {  page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
 struct web_page : public page { web_page(web_page&&) = delete; using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
@@ -38,6 +39,7 @@ int main()
     ::node n{ "web_node" };
 
     nds::node_ptr<::node> p0 = g.add(std::move(n));
+    nds::node_ptr<const ::node> cc { p0 };
 
     auto p1 = g.emplace<page, web_page>( p0, "test" );
     auto p2 = g.emplace<page, web_page>( p1, "test2" );

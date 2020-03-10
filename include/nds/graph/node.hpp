@@ -48,9 +48,8 @@ namespace nds
     template<class T>
     class node_ptr
     {
-        using type = std::remove_const_t<T>;
-        using node_type = std::conditional_t<std::is_const_v<T>, const nds::node<type>*, nds::node<T>*>;
-        template<class> friend class node_ptr;
+        using nc_type = std::remove_const_t<T>;
+        using node_type = std::conditional_t<std::is_const_v<T>, const nds::node<nc_type>*, nds::node<T>*>;
 
     public:
         node_ptr(nds::node<T>* ptr = nullptr)
@@ -58,14 +57,14 @@ namespace nds
         {}
 
         // construct const from non-const
-        template<class U, std::enable_if_t<std::is_same_v<T, const typename U::type>>...>
-        node_ptr(const U& u) : node_{ u.node_ } {  }
+        template<class U, std::enable_if_t<std::is_same_v<T, const U>>...>
+        node_ptr(const node_ptr<U>& u) : node_{ u.get() } {  }
 
         operator bool() const { return node_ != nullptr; }
 
         auto id() const { return node_->id(); }
         node_type get() const { return node_; }
-        void reset(nds::node<type>* node = nullptr) {  node_ = node; }
+        void reset(nds::node<nc_type>* node = nullptr) {  node_ = node; }
 
         T& operator*() const { return node_->get(); }
         T* operator->() const { return &node_->get(); }
