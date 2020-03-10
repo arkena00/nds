@@ -57,11 +57,6 @@ namespace nds
             : node_{ ptr }
         {}
 
-        template<class Node_B, class Node_T>
-        node_ptr(nds::basic_node<Node_B, Node_T>* ptr = nullptr)
-            : node_{ ptr }
-        {}
-
         // construct const from non-const
         template<class U, std::enable_if_t<std::is_same_v<T, const typename U::type>>...>
         node_ptr(const U& u) : node_{ u.node_ } {  }
