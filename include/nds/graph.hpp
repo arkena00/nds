@@ -32,6 +32,8 @@ namespace nds
         public:
             template<class T>
             using node_ptr = nds::node_ptr<T>;
+            template<class T>
+            using node_type = nds::node<T>;
 
             template<class T>
             using internal_node_ptr = std::unique_ptr<nds::node<T>>;
