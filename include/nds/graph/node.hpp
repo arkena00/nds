@@ -52,7 +52,7 @@ namespace nds
         using node_type = std::conditional_t<std::is_const_v<T>, const nds::node<nc_type>*, nds::node<T>*>;
 
     public:
-        node_ptr(nds::node<T>* ptr = nullptr)
+        node_ptr(node_type ptr = nullptr)
             : node_{ ptr }
         {}
 
