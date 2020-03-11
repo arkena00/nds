@@ -24,7 +24,7 @@ namespace nds::algorithm::graph
                     if (stop) return;
                     for (auto&& uptr : vector)
                     {
-                        nds::node_ptr nptr{ uptr.get() };
+                        nds::node_ptr<graph_node_type::base_type> nptr{ uptr.get() };
                         if (predicate(nptr))
                         {
                             callback(nptr);
@@ -51,7 +51,7 @@ namespace nds::algorithm::graph
                 using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
                 if constexpr (std::is_same_v<input_node_type, graph_node_type>)
                 {
-                    for (auto&& uptr : vector) callback(nds::node_ptr{ uptr.get() });
+                    for (auto&& uptr : vector) callback(nds::node_ptr<graph_node_type::base_type>{ uptr.get() });
                 }
             };
             std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
