@@ -1,6 +1,7 @@
 #ifndef INCLUDE_NDS_GRAPH_NODE_HPP_NDS
 #define INCLUDE_NDS_GRAPH_NODE_HPP_NDS
 
+#include <cstdint>
 #include <utility>
 
 namespace nds
