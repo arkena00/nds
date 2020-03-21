@@ -92,14 +92,14 @@ namespace nds::internal
     {
         nds::cx::for_each<Nodes>([&f, this](auto&& nt)
         {
-            using input_node_ptr = node_ptr<typename std::decay_t<decltype(nt)>::type>;
+            using input_node_type = node_type<typename std::decay_t<decltype(nt)>::type>;
 
             auto loop_graph_type = [&f](auto&& vector)
             {
-                using graph_node_ptr = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_ptr<T>
-                if constexpr (std::is_same_v<input_node_ptr, graph_node_ptr>)
+                using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
+                if constexpr (std::is_same_v<input_node_type, graph_node_type>)
                 {
-                    for (auto&& node : vector) f(node);
+                    for (auto&& uptr : vector) f(nds::node_ptr<typename graph_node_type::base_type>{ uptr.get() });
                 }
             };
 

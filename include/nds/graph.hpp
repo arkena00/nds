@@ -15,6 +15,8 @@
 
 namespace nds
 {
+    namespace algorithm { struct graph; }
+
     template<int N, typename... Ts> using argn =
     typename std::tuple_element<N, std::tuple<Ts...>>::type;
 
@@ -29,6 +31,8 @@ namespace nds
         template<class... Ts, class... Us, class... Vs>
         struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
+            friend struct nds::algorithm::graph;
+
         public:
             template<class T>
             using node_ptr = nds::node_ptr<T>;
@@ -36,7 +40,7 @@ namespace nds
             using node_type = nds::node<T>;
 
             template<class T>
-            using internal_node_ptr = std::unique_ptr<nds::node<T>>;
+            using internal_node_ptr = std::unique_ptr<node_type<T>>;
 
             using nodes_type = nds::graph_types<Ts...>;
             using edges_type = nds::graph_edges<edge<Us, Vs>...>;
@@ -86,7 +90,7 @@ namespace nds
             void connect(int s, int t);
              */
 
-        public:
+        private:
             node_container_type nodes_;
             edge_container_type edges_;
         };

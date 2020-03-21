@@ -51,10 +51,15 @@ int main()
     g.connect(p0, p2);
     //g.connect(p1, p2);
 
-    nds::node_ptr<::page> source = nullptr;
-    g.targets(p0, [](auto&& node)
+    nds::algorithm::graph::for_each(g, [](auto&& node)
     {
-        std::cout << "\nnode: " << node->name;
+        std::cout << "\n" << node->name;
+    });
+
+    nds::node_ptr<::page> source = nullptr;
+    g.nodes<nds::graph_types<page, node>>([](auto&& node)
+    {
+        std::cout << "\n: " << node->name;
     });
 
     //nds::node_ptr<::page> source;
