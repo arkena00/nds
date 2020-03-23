@@ -53,9 +53,9 @@ namespace nds
             template<class B = void, class T, class Source>
             auto add(T v, node_ptr<Source>);
 
-            template<class B, class T, class... Args, disable_node<Args...> = 0>
+            template<class B = void, class T, class... Args, disable_node<Args...> = 0>
             auto emplace(Args&&... args);
-            template<class B, class T, class Source, class... Args>
+            template<class B = void, class T, class Source, class... Args>
             auto emplace(node_ptr<Source> source, Args&&... args);
 
             template<class Source, class Target>
