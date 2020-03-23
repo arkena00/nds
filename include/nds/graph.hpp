@@ -75,7 +75,7 @@ namespace nds
             void sources(node_ptr<Target> target, F&& f);
 
             template<class Source, class F>
-            void targets(node_ptr<Source> source, F&& f);
+            void targets(node_ptr<Source> source, F&& f) const;
 
             static constexpr std::size_t count_nodes_type();
             static constexpr std::size_t count_edges_type();

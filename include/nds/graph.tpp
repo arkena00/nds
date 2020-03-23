@@ -158,11 +158,14 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class Source, class F>
+    template<class Source_type, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::targets(node_ptr<Source> source, F&& f)
+    ::targets(node_ptr<Source_type> source_, F&& f) const
     {
-        if (!source) return;
+        if (!source_) return;
+        using Source = std::remove_const_t<Source_type>;
+        node_ptr<Source> source{ const_cast<node_type<Source>*>(source_.get()) };
+
         auto loop_graph_edge = [&](auto&& vector)
         {
             using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_ptr<T>
