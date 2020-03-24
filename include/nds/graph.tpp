@@ -35,18 +35,22 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class B, class T, class... Args, disable_node<Args...>>
+    template<class B, class T, class... Args>
     auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::emplace(Args&&... args)
     {
-        constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<B>>, node_container_type>::value;
+        using T0 = typename internal::argn<0, Ts...>::type;
+        using Type = std::conditional_t<std::is_same_v<T, void>, T0, T>;
+        using Base = std::conditional_t<std::is_same_v<B, void>, Type, B>;
 
-        auto ptr = std::make_unique<basic_node<T, B>>( std::forward<Args>(args)... );
+        constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<Base>>, node_container_type>::value;
+
+        auto ptr = std::make_unique<basic_node<Type, Base>>( std::forward<Args>(args)... );
         auto last_node = ptr.get();
 
         std::get<type_index>(nodes_).emplace_back(std::move(ptr));
 
-        return node_ptr<B>(last_node);
+        return node_ptr<Base>(last_node);
     }
 
     template<class... Ts, class... Us, class... Vs>
@@ -78,14 +82,6 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::nodes(F&& f) const
-    {
-        nodes<nodes_type>(std::forward<F>(f));
-    }
-
-    template<class... Ts, class... Us, class... Vs>
     template<class Nodes, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::nodes(F&& f) const
@@ -105,14 +101,6 @@ namespace nds::internal
 
             std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, nodes_);
         });
-    }
-
-    template<class... Ts, class... Us, class... Vs>
-    template<class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::edges(F&& f) const
-    {
-        edges<edges_type>(std::forward<F>(f));
     }
 
     template<class... Ts, class... Us, class... Vs>
@@ -139,7 +127,7 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class Target, class F>
+    template<class Nodes, class Target, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::sources(node_ptr<Target> target, F&& f)
     {
@@ -158,7 +146,7 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class Source_type, class F>
+    template<class Targets, class Source_type, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::targets(node_ptr<Source_type> source_, F&& f) const
     {
@@ -166,17 +154,26 @@ namespace nds::internal
         using Source = std::remove_const_t<Source_type>;
         node_ptr<Source> source{ const_cast<node_type<Source>*>(source_.get()) };
 
-        auto loop_graph_edge = [&](auto&& vector)
+        nds::cx::for_each<Targets>([&, this](auto&& nt)
         {
-            using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::source_type; // node_ptr<T>
+            using input_node_type = node_type<typename std::decay_t<decltype(nt)>::type>; // node<T>
 
-            for (auto&& edge : vector)
+            auto loop_graph_edge = [&](auto&& vector)
             {
-                if (source.id() == edge.source.id()) f(edge.target);
-            }
-        };
+                using graph_edge_type = typename std::decay_t<decltype(vector)>::value_type::target_type; // node_ptr<T>
+
+                // node<T>::base_type == node_ptr<T>::type
+                if constexpr (std::is_same_v<typename input_node_type::base_type, typename graph_edge_type::type>)
+                {
+                    for (auto&& edge : vector)
+                    {
+                        if (source.id() == edge.source.id()) f(edge.target);
+                    }
+                }
+            };
 
         std::apply([&](auto&&... vectors) { (loop_graph_edge(vectors), ...); }, edges_);
+        });
     }
 
     template<class... Ts, class... Us, class... Vs>

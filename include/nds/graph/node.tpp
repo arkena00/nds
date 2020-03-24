@@ -3,14 +3,14 @@ namespace nds
     template<class T, class Base>
     template<class... Us>
     basic_node<T, Base>::basic_node(Us&&... us)
-        : basic_node( typename std::is_constructible<T, basic_node<T>*, Us...>::type{}, std::forward<Us>(us)...)
+        : basic_node( typename std::is_constructible<T, nds::node_ptr<Base>, Us...>::type{}, std::forward<Us>(us)...)
     {}
 
     // node constructor
     template<class T, class Base>
     template<class... Us>
     basic_node<T, Base>::basic_node(std::true_type, Us&&... us)
-        : value_{ this , std::forward<Us>(us)... }
+        : value_{ nds::node_ptr<Base>{ this } , std::forward<Us>(us)... }
     {}
 
     // default constructor
@@ -74,6 +74,12 @@ namespace nds
     void node_ptr<T>::reset(nds::node<nc_type>* node)
     {
         node_ = node;
+    }
+
+    template<class T>
+    T& node_ptr<T>::value() const
+    {
+        return node_->get();
     }
 
     template<class T>

@@ -5,7 +5,17 @@
 #include <nds/algorithm/graph.hpp>
 
 struct node_base { virtual std::string info() = 0; };
-struct node : node_base { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
+struct node : node_base
+{
+    node(std::string n) : name{n}{  }
+
+    node(nds::node_ptr<const ::node> nn, std::string n) : name{n}
+    {
+        std::cout << nn.id() << " " << this;
+    }
+
+    std::string name; virtual std::string info() {  return name + "\\n"; }
+};
 
 struct page {  page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
 struct web_page : public page { web_page(web_page&&) = delete; using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
@@ -36,13 +46,15 @@ int main()
     ::explorer_page ep{"explorer_page"};
     ep.path = "/home";
 
-    ::node n{ "web_node" };
+    //::node n{ "web_node" };
 
-    nds::node_ptr<::node> p0 = g.add(std::move(n));
+    nds::node_ptr<::node> p0 = g.emplace<::node, ::node>("web_node");
     nds::node_ptr<const ::node> cc { p0 };
 
     auto p1 = g.emplace<page, web_page>( p0, "test" );
     auto p2 = g.emplace<page, web_page>( p1, "test2" );
+
+    std::cout << "\n__" << p0.id();
 
     //g.connect(p1, p2);
     //g.connect(p2, p1);
@@ -56,11 +68,13 @@ int main()
         std::cout << "\n" << node->name;
     });
 
-    nds::node_ptr<::page> source = nullptr;
+
     g.nodes<nds::graph_types<page, node>>([](auto&& node)
     {
         std::cout << "\n: " << node->name;
     });
+
+
 
     //nds::node_ptr<::page> source;
 

@@ -44,14 +44,19 @@ namespace nds
         T value_;
     };
 
+    class node_ptr_base{};
+
     template<class T>
-    class node_ptr
+    class node_ptr : node_ptr_base
     {
         using nc_type = std::remove_const_t<T>;
         using node_type = std::conditional_t<std::is_const_v<T>, const nds::node<nc_type>*, nds::node<T>*>;
 
     public:
-        node_ptr(node_type ptr = nullptr);
+        using type = T;
+
+    public:
+        explicit node_ptr(node_type ptr = nullptr);
 
         // construct const from non-const
         template<class U, std::enable_if_t<std::is_same_v<T, const U>>...>
@@ -62,6 +67,7 @@ namespace nds
         auto id() const;
         node_type get() const;
         void reset(nds::node<nc_type>* node = nullptr);
+        T& value() const;
 
         T& operator*() const;
         T* operator->() const;

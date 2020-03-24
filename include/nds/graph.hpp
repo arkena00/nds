@@ -17,14 +17,14 @@ namespace nds
 {
     namespace algorithm { struct graph; }
 
-    template<int N, typename... Ts> using argn =
-    typename std::tuple_element<N, std::tuple<Ts...>>::type;
-
     namespace internal
     {
+        template<int N, typename... Ts>
+        struct argn : std::tuple_element<N, std::tuple<Ts...>>{};
+
         template<class... Args>
         using disable_node = std::enable_if_t<
-        !std::is_base_of_v<node_base, std::decay_t<argn<0, Args...>>>
+        !std::is_base_of_v<nds::node_ptr_base, std::decay_t<argn<0, Args...>>>
         , bool
         >;
 
@@ -53,28 +53,24 @@ namespace nds
             template<class B = void, class T, class Source>
             auto add(T v, node_ptr<Source>);
 
-            template<class B = void, class T, class... Args, disable_node<Args...> = 0>
+            template<class B = void, class T = B, class... Args>
             auto emplace(Args&&... args);
-            template<class B = void, class T, class Source, class... Args>
+            template<class B = void, class T = B, class Source, class... Args>
             auto emplace(node_ptr<Source> source, Args&&... args);
 
             template<class Source, class Target>
             void connect(node_ptr<Source> source, node_ptr<Target> target);
 
-            template<class F>
-            void nodes(F&& f) const;
-            template<class Nodes, class F>
+            template<class Nodes = nodes_type, class F>
             void nodes(F&& f) const;
 
-            template<class F>
-            void edges(F&& f) const;
-            template<class Edges, class F>
+            template<class Edges = edges_type, class F>
             void edges(F&& f) const;
 
-            template<class Target, class F>
+            template<class Nodes = nodes_type, class Target, class F>
             void sources(node_ptr<Target> target, F&& f);
 
-            template<class Source, class F>
+            template<class Targets = nodes_type, class Source, class F>
             void targets(node_ptr<Source> source, F&& f) const;
 
             static constexpr std::size_t count_nodes_type();

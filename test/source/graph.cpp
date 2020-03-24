@@ -3,24 +3,79 @@
 #include <nds/graph.hpp>
 #include <nds/cx/index_of.hpp>
 
-TEST(graph, construction)
+TEST(graph, construction_0_args_basic)
 {
     struct ctor
     {
-        ctor(int ) : node_ctor { false } {}
-        ctor(nds::node_ptr<ctor>, int) : node_ctor { true }{ }
-        bool node_ctor = false;
+        ctor() = default;
+        ctor(nds::node_ptr<ctor> node) : node_ctor_ { true }{ }
+        bool node_ctor_ = false;
+         nds::node_ptr<ctor> ptr_;
+    };
+
+    nds::graph<ctor> g;
+
+    auto n0 = g.add(ctor{});
+
+    auto n1 = g.emplace<ctor, ctor>(n0);
+    auto n10 = g.emplace<ctor>(n0);
+    auto n11 = g.emplace(n0);
+    EXPECT_TRUE( n1->node_ctor_ == true );
+    EXPECT_TRUE( n10->node_ctor_ == true );
+    EXPECT_TRUE( n11->node_ctor_ == true );
+
+    auto n2 = g.emplace<ctor, ctor>();
+    auto n20 = g.emplace<ctor>();
+    auto n21 = g.emplace();
+    EXPECT_TRUE( n2->node_ctor_ == true );
+    EXPECT_TRUE( n20->node_ctor_ == true );
+    EXPECT_TRUE( n21->node_ctor_ == true );
+}
+
+TEST(graph, construction_1_args_basic)
+{
+    struct ctor
+    {
+        explicit ctor(int) : node_ctor_ { false } {}
+        ctor(nds::node_ptr<ctor> node, int) : node_ctor_ { true }{ }
+        bool node_ctor_ = false;
+         nds::node_ptr<ctor> ptr_;
     };
 
     nds::graph<ctor> g;
 
     auto n0 = g.add(ctor{0});
 
-    auto n1 = g.emplace(n0, 0);
-    EXPECT_TRUE( n1->node_ctor == true );
+    auto n1 = g.emplace<ctor, ctor>(n0, 0);
+    auto n10 = g.emplace<ctor>(n0, 0);
+    auto n11 = g.emplace(n0, 0);
+    EXPECT_TRUE( n1->node_ctor_ == true );
+    EXPECT_TRUE( n10->node_ctor_ == true );
+    EXPECT_TRUE( n11->node_ctor_ == true );
 
-    auto n2 = g.emplace(0);
-    EXPECT_TRUE( n2->node_ctor == true );
+    auto n2 = g.emplace<ctor, ctor>(0);
+    auto n20 = g.emplace<ctor>(0);
+    auto n21 = g.emplace(0);
+    EXPECT_TRUE( n2->node_ctor_ == true );
+    EXPECT_TRUE( n20->node_ctor_ == true );
+    EXPECT_TRUE( n21->node_ctor_ == true );
+}
+
+TEST(graph, construction_1_args_complex)
+{
+    struct ctor : structs::web_page
+    {
+        ctor(nds::node_ptr<structs::page> ptr, std::string s) : web_page(s) , node_ctor_ { true }, ptr_{ ptr } { }
+        bool node_ctor_ = false;
+        nds::node_ptr<structs::page> ptr_;
+    };
+
+    graphs::complex g;
+
+    auto n0 = g.add<structs::page>( structs::web_page{ "web_page" });
+    auto n1 = g.emplace<structs::page, ctor>("web_page");
+    EXPECT_TRUE( static_cast<ctor&>(*n1).node_ctor_ == true );
+    EXPECT_TRUE( n1.id() == static_cast<ctor&>(*n1).ptr_.id() );
 }
 
 TEST(graph, adding_basic)
