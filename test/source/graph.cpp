@@ -127,7 +127,7 @@ TEST(graph, adding_complex)
     EXPECT_TRUE( i4->name == "web_page" );
 }
 
-TEST(graph, edging_basic)
+TEST(graph, connecting_basic)
 {
     graphs::basic g;
 
@@ -156,7 +156,7 @@ TEST(graph, edging_basic)
     EXPECT_TRUE( v_sources[0] == *n0 && v_sources[1] == *n3 );
 }
 
-TEST(graph, edging_multi)
+TEST(graph, connecting_multi)
 {
     graphs::multi_type g;
 
@@ -199,7 +199,7 @@ TEST(graph, edging_multi)
     EXPECT_TRUE( v_sources[0] == *n0  );
 }
 
-TEST(graph, edging_complex)
+TEST(graph, connecting_complex)
 {
     graphs::complex g;
 

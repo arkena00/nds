@@ -22,12 +22,6 @@ namespace nds
         template<int N, typename... Ts>
         struct argn : std::tuple_element<N, std::tuple<Ts...>>{};
 
-        template<class... Args>
-        using disable_node = std::enable_if_t<
-        !std::is_base_of_v<nds::node_ptr_base, std::decay_t<argn<0, Args...>>>
-        , bool
-        >;
-
         template<class... Ts, class... Us, class... Vs>
         struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {

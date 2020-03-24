@@ -56,7 +56,7 @@ namespace nds
         using type = T;
 
     public:
-        explicit node_ptr(node_type ptr = nullptr);
+        node_ptr(node_type ptr = nullptr);
 
         // construct const from non-const
         template<class U, std::enable_if_t<std::is_same_v<T, const U>>...>
