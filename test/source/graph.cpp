@@ -1,48 +1,155 @@
 #include "../test.hpp"
 
 #include <nds/graph.hpp>
+#include <nds/cx/index_of.hpp>
 
-struct node { node(std::string n) : name{n}{} std::string name; virtual std::string info() {  return name + "\\n"; } };
-
-struct page {  page(std::string n) : name{n}{} std::string name; virtual std::string info() const {  return name + "\\n"; } };
-struct web_page : public page { web_page(web_page&&) = delete; using page::page; std::string url; std::string info() const override {  return name + "\\n" + url; } };
-struct explorer_page : public page { using page::page; std::string path; std::string info() const override {  return name + "\\n" + path; } };
-
-
-TEST(graph, base)
+TEST(graph, construction)
 {
-    ASSERT_TRUE( true == true );
+    struct ctor
+    {
+        ctor(int ) : node_ctor { false } {}
+        ctor(nds::node_ptr<ctor>, int) : node_ctor { true }{ }
+        bool node_ctor = false;
+    };
 
-    using Edges = nds::graph_edges<nds::edge<page, page>, nds::edge<::node, page>, nds::edge<page, ::node>>;
-    using Types = nds::graph_types<page, node>;
+    nds::graph<ctor> g;
 
-    nds::graph<Types, Edges> g;
+    auto n0 = g.add(ctor{0});
 
-    ::web_page wp{"web_page"};
-    wp.url = "neuroshok.com";
+    auto n1 = g.emplace(n0, 0);
+    EXPECT_TRUE( n1->node_ctor == true );
 
-    ::explorer_page ep{"explorer_page"};
-    ep.path = "/home";
+    auto n2 = g.emplace(0);
+    EXPECT_TRUE( n2->node_ctor == true );
+}
 
-    ::node n{ "web_node" };
+TEST(graph, adding_basic)
+{
+    graphs::basic g;
 
-    nds::node_ptr<::node> p0 = g.add(std::move(n));
+    auto i0 = g.add(9);
+    EXPECT_TRUE( *i0 == 9 );
 
-    // add
-    g.add(::node{"test"});
-    g.add(::page{"test"});
+    auto i1 = g.emplace(8);
+    EXPECT_TRUE( *i1 == 8 );
+}
 
-    g.add<::node>(::node{"test"});
-    g.add<::page>(::explorer_page{"test"});
-    g.add<::page, ::explorer_page>(::explorer_page{"test"});
+TEST(graph, adding_multi)
+{
+    graphs::multi_type g;
 
+    auto i0 = g.add(9);
+    EXPECT_TRUE( *i0 == 9 );
 
-    auto p1 = g.emplace<page, web_page>( p0, "test" );
-    auto p2 = g.emplace<page, web_page>( p1, "test2" );
+    auto i1= g.add('A');
+    EXPECT_TRUE( *i1 == 'A' );
 
+    auto i2 = g.emplace(8);
+    EXPECT_TRUE( *i2 == 8 );
 
-    g.connect(p0, p2);
+    auto i3 = g.emplace<char>('B');
+    EXPECT_TRUE( *i3 == 'B' );
+}
 
-    nds::node_ptr<::page> source = nullptr;
-    g.targets(p0, [](auto&& node){ std::cout << "\nnode " << node->name; });
+TEST(graph, adding_complex)
+{
+    graphs::complex g;
+
+    auto i0 = g.add(structs::page{ "page" });
+    EXPECT_TRUE( i0->name == "page" );
+
+    auto i1 = g.add<structs::page>(structs::web_page{ "web_page" });
+    EXPECT_TRUE( i1->name == "web_page" );
+
+    auto move_p = structs::explorer_page{ "explorer_page" };
+    auto i2 = g.add<structs::page>(std::move(move_p));
+    EXPECT_TRUE( i2->name == "explorer_page" );
+
+    auto i3 = g.emplace<structs::page>( "emplace_page" );
+    EXPECT_TRUE( i3->name == "emplace_page" );
+
+    auto i4 = g.emplace<structs::page, structs::web_page>( "web_page" );
+    EXPECT_TRUE( i4->name == "web_page" );
+}
+
+TEST(graph, edging_basic)
+{
+    graphs::basic g;
+
+    nds::node_ptr<int> n0 = g.add(1);
+    auto n1 = g.add(2);
+    auto n2 = g.add(3);
+    auto n3 = g.add(4, n1);
+
+    g.connect(n0, n1);
+    g.connect(n0, n2);
+    g.connect(n3, n1);
+
+    std::vector<int> v_nodes;
+    g.nodes([&v_nodes](auto&& node) { v_nodes.push_back(*node); });
+    EXPECT_TRUE( v_nodes.size() == g.count_nodes() );
+    EXPECT_TRUE( v_nodes[0] == 1 && v_nodes[1] == 2 && v_nodes[2] == 3 );
+
+    std::vector<int> v_targets;
+    g.targets(n0, [&v_targets](auto&& node) { v_targets.push_back(*node); });
+    EXPECT_TRUE( v_targets.size() == 2 );
+    EXPECT_TRUE( v_targets[0] == 2 && v_targets[1] == 3 );
+
+    std::vector<int> v_sources;
+    g.sources(n1, [&v_sources](auto&& node) { v_sources.push_back(*node); });
+    ASSERT_TRUE( v_sources.size() == 2 );
+    EXPECT_TRUE( v_sources[0] == *n0 && v_sources[1] == *n3 );
+}
+
+TEST(graph, edging_multi)
+{
+    graphs::multi_type g;
+
+    nds::node_ptr<int> n0 = g.add(1);
+    nds::node_ptr<char> n1 = g.add('A');
+    nds::node_ptr<char> n2 = g.add('B');
+    nds::node_ptr<int> n3 = g.add(2);
+
+    g.connect(n0, n1);
+    g.connect(n0, n2);
+    g.connect(n0, n3);
+
+    std::vector<int> v_nodes;
+    g.nodes([&v_nodes](auto&& node) { v_nodes.push_back(*node); });
+    ASSERT_TRUE( v_nodes.size() == g.count_nodes() );
+    EXPECT_TRUE( v_nodes[0] == 1 && v_nodes[1] == 2 && v_nodes[2] == 'A' );
+
+    std::vector<char> v_char_nodes;
+    g.nodes<nds::graph_types<char>>([&v_char_nodes](auto&& node) { v_char_nodes.push_back(*node); });
+    EXPECT_TRUE( v_char_nodes[0] == 'A' && v_char_nodes[1] == 'B' );
+
+    std::vector<int> v_targets;
+    g.targets(n0, [&v_targets](auto&& node) { v_targets.push_back(*node); });
+    ASSERT_TRUE( v_targets.size() == 3 );
+    EXPECT_TRUE( v_targets[0] == 2 && v_targets[1] == 'A' );
+
+    std::vector<char> v_char_targets;
+    g.targets<nds::graph_types<char>>(n0, [&v_char_targets](auto&& node) { v_char_targets.push_back(*node); });
+    ASSERT_TRUE( v_char_targets.size() == 2 );
+    EXPECT_TRUE( v_char_targets[0] == 'A' && v_char_targets[1] == 'B' );
+
+    std::vector<char> v_int_targets;
+    g.targets<nds::graph_types<int>>(n0, [&v_int_targets](auto&& node) { v_int_targets.push_back(*node); });
+    ASSERT_TRUE( v_int_targets.size() == 1 );
+    EXPECT_TRUE( v_int_targets[0] == 2  );
+
+    std::vector<int> v_sources;
+    g.sources(n1, [&v_sources](auto&& node) { v_sources.push_back(*node); });
+    ASSERT_TRUE( v_sources.size() == 1 );
+    EXPECT_TRUE( v_sources[0] == *n0  );
+}
+
+TEST(graph, edging_complex)
+{
+    graphs::complex g;
+
+    auto n0 = g.add(structs::page{ "page" });
+    auto n1 = g.add(0);
+
+    // g.connect(n1, n0); // compile time error
 }
