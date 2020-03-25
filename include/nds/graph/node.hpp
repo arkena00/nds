@@ -62,7 +62,7 @@ namespace nds
         template<class U, std::enable_if_t<std::is_same_v<T, const U>>...>
         node_ptr(const node_ptr<U>& u);
 
-        operator bool() const;
+        explicit operator bool() const;
 
         auto id() const;
         node_type get() const;
