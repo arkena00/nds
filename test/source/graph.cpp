@@ -208,3 +208,31 @@ TEST(graph, connecting_complex)
 
     // g.connect(n1, n0); // compile time error
 }
+
+TEST(graph, erase)
+{
+    graphs::basic g;
+
+    auto n0 = g.add(0);
+    auto n1 = g.add(1, n0);
+    auto n2 = g.add(2, n0);
+    auto n3 = g.add(3, n0);
+
+    g.erase_arc(n0, n2);
+    std::vector<int> targets;
+    g.targets(n0, [&targets](auto&& node) { targets.push_back(*node); });
+    ASSERT_TRUE(targets.size() == 2);
+    EXPECT_TRUE( targets[0] == 1 && targets[1] == 3);
+
+    g.add_arc(n0, n2);
+    targets.clear();
+    g.targets(n0, [&targets](auto&& node) { targets.push_back(*node); });
+    ASSERT_TRUE(targets.size() == 3);
+    EXPECT_TRUE( targets[0] == 1 && targets[1] == 3 && targets[2] == 2);
+
+    g.erase(n2);
+    targets.clear();
+    g.targets(n0, [&targets](auto&& node) { targets.push_back(*node); });
+    ASSERT_TRUE(targets.size() == 2);
+    EXPECT_TRUE( targets[0] == 1 && targets[1] == 3 );
+}

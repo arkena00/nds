@@ -52,8 +52,16 @@ namespace nds
             template<class B = void, class T = B, class Source, class... Args>
             auto emplace(node_ptr<Source> source, Args&&... args);
 
+            template<class Source>
+            void erase(node_ptr<Source>);
+
             template<class Source, class Target>
-            void connect(node_ptr<Source> source, node_ptr<Target> target);
+            void erase_arc(node_ptr<Source>, node_ptr<Target>);
+
+            template<class Source, class Target>
+            void add_arc(node_ptr<Source> source, node_ptr<Target> target);
+            template<class Source, class Target>
+            void connect(node_ptr<Source> source, node_ptr<Target> target); // alias
 
             template<class Nodes = nodes_type, class F>
             void nodes(F&& f) const;

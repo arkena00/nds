@@ -1,6 +1,8 @@
 #include <nds/graph/node.hpp>
+#include <algorithm>
+#include <cassert>
 #include <memory>
-struct node;
+
 namespace nds::internal
 {
     //! T type to store as node<T>, T must exists in the graph
@@ -64,9 +66,41 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
+    template<class Source>
+    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::erase(node_ptr<Source> node)
+    {
+        constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<Source>>, node_container_type>::value;
+        auto& nodes = std::get<type_index>(nodes_);
+        for (auto& edge : std::get<type_index>(edges_))
+        {
+            if (node.id() == edge.target.id() || node.id() == edge.source.id() ) erase_arc(edge.source, edge.target);
+        }
+
+        auto it = std::find_if(nodes.begin(), nodes.end(), [&node](auto& inptr) { return inptr->id() == node.id(); });
+        assert(it != nodes.end());
+        nodes.erase(it);
+    }
+
+    template<class... Ts, class... Us, class... Vs>
+    template<class Source, class Target>
+    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::erase_arc(node_ptr<Source> source, node_ptr<Target> target)
+    {
+        auto& edges = std::get<std::vector<nds::edge<node_ptr<Source>, node_ptr<Target>>>>(edges_);
+
+        auto it = std::find_if(edges.begin(), edges.end(), [&source, &target](auto& edge)
+        {
+            return source.id() == edge.source.id() && target.id() == edge.target.id();
+        });
+        assert(it != edges.end());
+        edges.erase(it);
+    }
+
+    template<class... Ts, class... Us, class... Vs>
     template<class Source_type, class Target_type>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::connect(node_ptr<Source_type> source_, node_ptr<Target_type> target_)
+    ::add_arc(node_ptr<Source_type> source_, node_ptr<Target_type> target_)
     {
         using Source = std::remove_const_t<Source_type>;
         using Target = std::remove_const_t<Target_type>;
@@ -79,6 +113,13 @@ namespace nds::internal
         // static_assert(index >= 0, "connection between U and V not allowed");
 
         std::get<type_index>(edges_).emplace_back(edge<node_ptr<Source>, node_ptr<Target>>{ source, target });
+    }
+    template<class... Ts, class... Us, class... Vs>
+    template<class Source_type, class Target_type>
+    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    ::connect(node_ptr<Source_type> source, node_ptr<Target_type> target)
+    {
+        add_arc(std::move(source), std::move(target));
     }
 
     template<class... Ts, class... Us, class... Vs>
