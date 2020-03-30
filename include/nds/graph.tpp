@@ -68,7 +68,7 @@ namespace nds::internal
     template<class... Ts, class... Us, class... Vs>
     template<class Source>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::erase(node_ptr<Source> node)
+    ::erase(node_ptr<Source>& node)
     {
         constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<Source>>, node_container_type>::value;
         auto& nodes = std::get<type_index>(nodes_);
@@ -80,6 +80,8 @@ namespace nds::internal
         auto it = std::find_if(nodes.begin(), nodes.end(), [&node](auto& inptr) { return inptr->id() == node.id(); });
         assert(it != nodes.end());
         nodes.erase(it);
+
+        node.reset();
     }
 
     template<class... Ts, class... Us, class... Vs>

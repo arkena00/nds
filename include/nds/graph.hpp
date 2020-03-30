@@ -53,7 +53,7 @@ namespace nds
             auto emplace(node_ptr<Source> source, Args&&... args);
 
             template<class Source>
-            void erase(node_ptr<Source>);
+            void erase(node_ptr<Source>&);
 
             template<class Source, class Target>
             void erase_arc(node_ptr<Source>, node_ptr<Target>);

@@ -52,11 +52,9 @@ namespace nds
         : node_{ u.get() }
     {}
 
-    template<class T>
-    node_ptr<T>::operator bool() const
-    {
-        return node_ != nullptr;
-    }
+    template<class T> node_ptr<T>::operator bool() const { return node_ != nullptr; }
+    template<class T> bool node_ptr<T>::operator==(std::nullptr_t) const { return node_ == nullptr; }
+    template<class T> bool node_ptr<T>::operator!=(std::nullptr_t) const { return node_ != nullptr; }
 
     template<class T>
     auto node_ptr<T>::id() const

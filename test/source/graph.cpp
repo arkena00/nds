@@ -231,6 +231,7 @@ TEST(graph, erase)
     EXPECT_TRUE( targets[0] == 1 && targets[1] == 3 && targets[2] == 2);
 
     g.erase(n2);
+    EXPECT_TRUE( n2 == nullptr );
     targets.clear();
     g.targets(n0, [&targets](auto&& node) { targets.push_back(*node); });
     ASSERT_TRUE(targets.size() == 2);
