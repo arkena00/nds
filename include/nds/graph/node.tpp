@@ -54,7 +54,9 @@ namespace nds
 
     template<class T> node_ptr<T>::operator bool() const { return node_ != nullptr; }
     template<class T> bool node_ptr<T>::operator==(std::nullptr_t) const { return node_ == nullptr; }
+    template<class T> bool node_ptr<T>::operator==(const node_ptr<T>& other) const { return node_ == other.node_; }
     template<class T> bool node_ptr<T>::operator!=(std::nullptr_t) const { return node_ != nullptr; }
+    template<class T> bool node_ptr<T>::operator!=(const node_ptr<T>& other) const { return node_ != other.node_; }
 
     template<class T>
     auto node_ptr<T>::id() const

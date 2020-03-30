@@ -64,7 +64,9 @@ namespace nds
 
         explicit operator bool() const;
         bool operator==(std::nullptr_t) const;
+        bool operator==(const node_ptr<T>&) const;
         bool operator!=(std::nullptr_t) const;
+        bool operator!=(const node_ptr<T>&) const;
 
         auto id() const;
         node_type get() const;
