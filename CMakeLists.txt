@@ -26,3 +26,7 @@ endif ()
 if (NDS_BENCHMARK)
     add_subdirectory(benchmark)
 endif ()
+
+if (NDS_TEST)
+    add_subdirectory(test)
+endif()

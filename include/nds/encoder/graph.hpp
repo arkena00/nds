@@ -48,12 +48,12 @@ namespace nds
 
                 input.edges([&output](auto&& edge)
                 {
-                    std::string source_id = std::to_string(reinterpret_cast<intptr_t>(edge.source));
-                    std::string source_name = node_name(edge.source->get());
+                    std::string source_id = std::to_string(reinterpret_cast<intptr_t>(edge.source.get()));
+                    std::string source_name = node_name(*edge.source);
                     std::string source_data = source_id + " [label=\"" + source_name + "\"];\n";
 
-                    std::string target_id = std::to_string(reinterpret_cast<intptr_t>(edge.target));
-                    std::string target_name = node_name(edge.target->get());
+                    std::string target_id = std::to_string(reinterpret_cast<intptr_t>(edge.target.get()));
+                    std::string target_name = node_name(*edge.target);
                     std::string target_data = target_id + " [label=\"" + target_name + "\"];\n";
 
                     nds::append(output

@@ -3,65 +3,69 @@
 
 #include <nds/graph.hpp>
 
-namespace nds::algorithm::graph
+namespace nds::algorithm
 {
-    //! \brief Find the first element for which predicate is true then return
-    //! Callback is called while predicate is true
-    //! Return when predicate is true
-    template<class Graph, class Predicate, class Callback>
-    void find_if(Graph& graph, Predicate&& predicate, Callback&& callback)
+    struct graph
     {
-        bool stop = false;
-        nds::cx::for_each<typename Graph::nodes_type>([&graph, &stop, &predicate, &callback](auto&& nt)
+        //! \brief Find the first element for which predicate is true then return
+        //! Callback is called while predicate is true
+        //! Return when predicate is true
+        template<class Graph, class Predicate, class Callback>
+        static void find_first_if(Graph& graph, Predicate&& predicate, Callback&& callback)
         {
-            using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
-
-            auto loop_graph_type = [&stop, &predicate, &callback](auto&& vector)
+            bool stop = false;
+            nds::cx::for_each<typename Graph::nodes_type>([&graph, &stop, &predicate, &callback](auto&& nt)
             {
-                using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
-                if constexpr (std::is_same_v<input_node_type, graph_node_type>)
+                using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
+
+                auto loop_graph_type = [&stop, &predicate, &callback](auto&& vector)
                 {
-                    if (stop) return;
-                    for (auto&& node : vector)
+                    using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
+                    if constexpr (std::is_same_v<input_node_type, graph_node_type>)
                     {
-                        if (predicate(node.get()))
+                        if (stop) return;
+                        for (auto&& uptr : vector)
                         {
-                            callback(node.get());
-                            stop = true;
-                            return;
+                            nds::node_ptr<typename graph_node_type::base_type> nptr{ uptr.get() };
+                            if (predicate(nptr))
+                            {
+                                callback(nptr);
+                                stop = true;
+                                return;
+                            }
                         }
                     }
-                }
-            };
+                };
 
-            std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
-        });
-    }
+                std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
+            });
+        }
 
-    template<class Graph, class Callback>
-    void for_each(Graph& graph, Callback&& callback)
-    {
-        nds::cx::for_each<typename Graph::nodes_type>([&graph, &callback](auto&& nt)
+        template<class Graph, class Callback>
+        static void for_each(Graph& graph, Callback&& callback)
         {
-            using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
-
-            auto loop_graph_type = [&callback](auto&& vector)
+            nds::cx::for_each<typename Graph::nodes_type>([&graph, &callback](auto&& nt)
             {
-                using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
-                if constexpr (std::is_same_v<input_node_type, graph_node_type>)
+                using input_node_type = typename Graph::template node_type<typename std::decay_t<decltype(nt)>::type>;
+
+                auto loop_graph_type = [&callback](auto&& vector)
                 {
-                    for (auto&& node : vector) callback(node.get());
-                }
-            };
-            std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
-        });
-    }
+                    using graph_node_type = typename std::decay_t<decltype(vector)>::value_type::element_type; // node_type<T>
+                    if constexpr (std::is_same_v<input_node_type, graph_node_type>)
+                    {
+                        for (auto&& uptr : vector) callback(node_ptr<typename graph_node_type::base_type>{ uptr.get() });
+                    }
+                };
+                std::apply([&](auto&&... vectors) { (loop_graph_type(vectors), ...); }, graph.nodes_);
+            });
+        }
 
-    template<class Graph, class Callback>
-    void source_path(Graph& graph, typename Graph::node_type node, Callback&& callback)
-    {
+        template<class Graph, class Callback>
+        static void source_path(Graph& graph, typename Graph::node_type node, Callback&& callback)
+        {
 
-    }
+        }
+    };
 } // nds::algorithm::graph
 
 #endif // INCLUDE_NDS_ALGORITHM_GRAPH_HPP_NDS

@@ -91,7 +91,7 @@ namespace nds
 
                 auto target_node = basic_node<T, Base>{ std::move(v) };
                 auto ptr = std::make_unique<basic_node<T, Base>>(std::move(target_node));
-                auto last_node = ptr.get();
+                auto last_node = nds::node_ptr<Base>(ptr.get());
 
                 std::get<type_index>(nodes_).emplace_back(std::move(ptr));
 

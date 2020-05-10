@@ -1,6 +1,8 @@
 #ifndef INCLUDE_NDS_GRAPH_EDGE_HPP_NDS
 #define INCLUDE_NDS_GRAPH_EDGE_HPP_NDS
-namespace nds {struct access;}
+
+#include <nds/graph/node.hpp>
+
 namespace nds
 {
     template<class Source, class Target>
@@ -10,10 +12,13 @@ namespace nds
         using source_type = Source;
         using target_type = Target;
 
-        edge(Source* s, Target* t) : source{ s }, target{ t } {}
+        edge(Source s, Target t)
+            : source{ std::move(s) }
+            , target{ std::move(t) }
+        {}
 
-        Source* source;
-        Target* target;
+        Source source;
+        Target target;
     };
 } // nds
 
