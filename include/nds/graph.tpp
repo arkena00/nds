@@ -172,7 +172,7 @@ namespace nds::internal
     template<class... Ts, class... Us, class... Vs>
     template<class Nodes, class Target, class F>
     void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
-    ::sources(node_ptr<Target> target, F&& f)
+    ::sources(node_ptr<Target> target, F&& f) const
     {
         if (!target) return;
         auto loop_graph_edge = [&](auto&& vector)
