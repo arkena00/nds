@@ -70,7 +70,7 @@ namespace nds
             void edges(F&& f) const;
 
             template<class Nodes = nodes_type, class Target, class F>
-            void sources(node_ptr<Target> target, F&& f);
+            void sources(node_ptr<Target> target, F&& f) const;
 
             template<class Targets = nodes_type, class Source, class F>
             void targets(node_ptr<Source> source, F&& f) const;
