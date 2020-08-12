@@ -60,10 +60,30 @@ namespace nds::algorithm
             });
         }
 
-        template<class Graph, class Callback>
-        static void source_path(Graph& graph, typename Graph::node_type node, Callback&& callback)
+        template<class Graph, class T, class Callback>
+        static void source_path(Graph& g, nds::node_ptr<T> origin_node, Callback&& callback)
         {
+            bool has_source = false;
+            auto test_node = origin_node;
 
+            auto f = [&](auto&& node)
+            {
+                has_source = false;
+                g.sources<nds::graph_types<T>>(node, [&](auto path_node)
+                {
+                    if constexpr(std::is_same_v<decltype(path_node), nds::node_ptr<T>>)
+                    {
+                        has_source = true;
+                        callback(path_node);
+                        test_node = path_node;
+                    }
+                });
+            };
+
+            while (has_source)
+            {
+                f(test_node);
+            }
         }
     };
 } // nds::algorithm::graph
