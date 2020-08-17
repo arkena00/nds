@@ -95,7 +95,6 @@ namespace nds
                 return lemon::node_ptr<Base>(last_node_id, last_node);
             }
 
-
             template<class Edge_type, class Source_type, class Target_type>
             void add_arc(lemon::node_ptr<Source_type> source, lemon::node_ptr<Target_type> target, Edge_type&& edge)
             {
@@ -134,6 +133,25 @@ namespace nds
                             }
                      }
                 });
+            }
+
+            template<class B = void, class T = B, class... Args>
+            auto emplace(Args&&... args)
+            {
+                using T0 = typename internal::argn<0, Ts...>::type;
+                using Type = std::conditional_t<std::is_same_v<T, void>, T0, T>;
+                using Base = std::conditional_t<std::is_same_v<B, void>, Type, B>;
+
+                constexpr int node_type_index = cx::index_of<::lemon::ListDigraph::NodeMap<internal_node_ptr<Base>>, node_container_type>::value;
+
+                auto last_node_id = graph_.addNode();
+
+                auto ptr = std::make_unique<Base>( std::forward<Args>(args)... );
+                auto last_node = ptr.release();
+
+                std::get<node_type_index>(nodes_)[last_node_id] = last_node;
+
+                return lemon::node_ptr<Base>(last_node_id, last_node);
             }
 
         private:

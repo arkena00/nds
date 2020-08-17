@@ -32,7 +32,9 @@ int main()
 
     nds::graph<Nodes, Edges, nds::graph_storages::lemon> gg;
 
-    auto n00 = gg.add(id_expression("ngl"));
+    auto n00 = gg.emplace("ngl");
+
+
     auto n01 = gg.add(id_expression("ngl01"));
     auto n02 = gg.add(id_expression("ngl02"));
     auto n03 = gg.add(id_expression("ngl03"));
