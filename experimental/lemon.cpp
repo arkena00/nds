@@ -11,51 +11,44 @@ struct expression
 
 struct id_expression : expression
 {
-    id_expression(std::string name) : name_{ std::move(name) } {}
-    std::string name_ = "default";
+    id_expression(std::string n) : name{ std::move(n) } {}
+    std::string name = "default";
 };
 
 
-class idmap : public lemon::MapBase<lemon::ListDigraph::Node, id_expression>
+
+struct edges
 {
-  const lemon::ListDigraph &g;
-  const id_expression &pot;
-
-public:
-  auto operator[](int e) const {
-    return 0;
-  }
-
-  idmap(const lemon::ListDigraph &_g, id_expression&_p)
-    : g(_g), pot(_p) {};
+    struct has{int id = 8;};
+    struct is{int id = 9; std::string truc; };
 };
 
-
-
-struct edge
-{
-};
 
 int main()
 {
-    using Edges = nds::graph_edges<nds::edge<id_expression, id_expression>>;
-    using Types = nds::graph_nodes<id_expression>;
 
-    nds::graph<Types, Edges, nds::graph_storages::lemon> gg;
+    using Nodes = nds::graph_nodes<id_expression>;
+    using Edges = nds::graph_edges<edges::is, edges::has>;
+
+    nds::graph<Nodes, Edges, nds::graph_storages::lemon> gg;
 
     auto n00 = gg.add(id_expression("ngl"));
     auto n01 = gg.add(id_expression("ngl01"));
     auto n02 = gg.add(id_expression("ngl02"));
+    auto n03 = gg.add(id_expression("ngl03"));
 
-    gg.add_arc(n00, n01);
-    gg.add_arc(n00, n02);
+    gg.add_arc(n00, n01, edges::has{});
+    gg.add_arc(n00, n02, edges::is{ 7, "aze" });
+    gg.add_arc(n00, n03, edges::is{ 6, "pouet" });
 
-    gg.targets(n00, [](auto&& n) { std::cout << "\n__" << n->name_; } );
+    //nds::edge<edges::has> e{  };
+
+    gg.targets<edges::is>(n00, [](auto&& n, auto&& e) { std::cout << "\n__" << n->name <<  " " << e->truc; } );
 
 
+/*
     lemon::ListDigraph g;
-
-    lemon::ListDigraph::ArcMap<edge> edge_logic(g);
+    lemon::ListDigraph::ArcMap<edgemap<int>> e_map(g);
 
     auto id = new id_expression("ngl");
     auto id1 = new id_expression("ngl1");
@@ -78,7 +71,7 @@ int main()
 
     auto a = g.addArc(n0, n1);
     auto b = g.addArc(n0, n2);
-
+    e_map[a] = 0;
 
 
     for (lemon::ListDigraph::OutArcIt i(g, n0); i != lemon::INVALID; ++i)
@@ -86,7 +79,7 @@ int main()
         std::cout << "\n" << n0_map[g.target(i)]->name_;
     }
 
-
+*/
 
     /*
     lemon::graphToEps(g,"descriptor_map_demo.eps").scaleToA4().

@@ -20,12 +20,12 @@ namespace graphs
 
     using multi_type = nds::graph<
         nds::graph_nodes<int, char>
-        , nds::graph_edges<nds::edge<int, int>, nds::edge<int, char>, nds::edge<char, int>>
+        , nds::graph_rules<nds::edge<int, int>, nds::edge<int, char>, nds::edge<char, int>>
     >;
 
     using complex = nds::graph<
             nds::graph_nodes<structs::page, structs::node, int>
-            , nds::graph_edges<
+            , nds::graph_rules<
                 nds::edge<structs::page, structs::page>
                 , nds::edge<structs::node, structs::page>
                 , nds::edge<structs::page, structs::node>

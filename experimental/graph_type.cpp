@@ -7,7 +7,7 @@
 
 int main()
 {
-    using Edges = nds::graph_edges<
+    using Edges = nds::graph_rules<
         nds::edge<int, char>,
         nds::edge<int, int>
         >;
@@ -32,7 +32,7 @@ int main()
     g.targets(n1, [](auto&& node){ std::cout << "\n" << node->get(); });
 
 
-    using Edges_filter = nds::graph_edges<nds::edge<int, char>>;
+    using Edges_filter = nds::graph_rules<nds::edge<int, char>>;
 
     g.edges([](auto&& edge){ std::cout << "\nedge " << edge.source->get() << " | " << edge.target->get(); });
     //g.edges<Edges_filter>([](auto&& edge){ std::cout << "\nedge " << edge.source->get() << " | " << edge.target->get(); });

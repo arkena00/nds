@@ -5,8 +5,11 @@
 
 namespace nds
 {
-    template<class Source, class Target, class Type = void>
-    class edge
+    template<class...>
+    class edge;
+
+    template<class Source, class Target>
+    class edge<Source, Target>
     {
     public:
         using source_type = Source;
@@ -20,6 +23,18 @@ namespace nds
         Source source;
         Target target;
     };
+
+    template<class Type>
+    class edge<Type>
+    {
+    public:
+        edge(Type&& type)
+            : type{ std::forward(type) }
+        {}
+
+        Type type;
+    };
 } // nds
+
 
 #endif // INCLUDE_NDS_GRAPH_EDGE_HPP_NDS

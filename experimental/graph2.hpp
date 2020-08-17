@@ -30,7 +30,7 @@ namespace nds
     };
 
     template<class... Edges>
-    struct graph_edges{};
+    struct graph_rules{};
 
     template<class... Types>
     struct graph_nodes{};
@@ -43,7 +43,7 @@ namespace nds
     namespace internal
     {
         template<class...>
-        struct graph;
+        struct class;
 
         template<class...>
         struct graph_trait;
@@ -52,19 +52,19 @@ namespace nds
         template<class T>
         struct graph_trait<T>
         {
-            using type = graph<nds::graph_nodes<T>, nds::graph_edges<nds::edge<T, T>>>;
+            using type = graph<nds::graph_nodes<T>, nds::graph_rules<nds::edge<T, T>>>;
         };
 
-        // graph<Graph_nodes, Graph_edges>
+        // graph<Graph_nodes, Graph_rules>
         template<class... Ts, class... Us, class... Vs>
-        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
+        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>>
         {
-            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>;
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>>;
         };
 
 
         template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>> //: nds::concept<nds::concepts::graph>
+        class graph<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>> //: nds::concept<nds::concepts::graph>
         {
         public:
             template<class T>
@@ -73,7 +73,7 @@ namespace nds
             template<class T>
             using node_ptr = std::unique_ptr<node_type<T>>;
 
-            using edges_type = nds::graph_edges<edge<Us, Vs>...>;
+            using edges_type = nds::graph_rules<edge<Us, Vs>...>;
             using nodes_type = nds::graph_nodes<Ts...>;
 
             using node_container_type = std::tuple<std::vector<node_ptr<Ts>>...>;

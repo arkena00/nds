@@ -6,10 +6,10 @@
 namespace nds
 {
     template<class... Edges>
-    struct graph_edges{};
+    struct graph_rules{};
 
     template<class... Edge_types>
-    struct graph_edge_types{};
+    struct graph_edges{};
 
     template<class... Types>
     struct graph_nodes{};
@@ -30,35 +30,56 @@ namespace nds
     namespace internal
     {
         template<class...>
-        struct graph;
+        class graph;
 
         // graph<type1, type2, ...>
         template<class... Ts>
         struct graph_trait
         {
-            // todo: generate all edges
-            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Ts, Ts>...>, graph_storages::default_storage>;
+            // todo: generate all rules
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<void>, nds::graph_rules<nds::edge<Ts, Ts>...>, graph_storages::default_storage>;
         };
 
         // graph<T>
         template<class T>
         struct graph_trait<T>
         {
-            using type = graph<nds::graph_nodes<T>, nds::graph_edges<nds::edge<T, T>>, graph_storages::default_storage>;
+            using type = graph<nds::graph_nodes<T>, nds::graph_edges<void>, nds::graph_rules<nds::edge<T, T>>, graph_storages::default_storage>;
         };
 
-        // graph<graph_nodes, Graph_edges>
+        // graph<graph_nodes>
+        template<class... Ts>
+        struct graph_trait<nds::graph_nodes<Ts...>>
+        {
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<void>, nds::graph_rules<nds::edge<Ts, Ts>...>, graph_storages::default_storage>;
+        };
+
+        // graph<graph_nodes, graph_edges>
+        template<class... Ts, class... Es>
+        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_edges<Es...>>
+        {
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<Es...>, nds::graph_rules<nds::edge<Ts, Ts>...>, graph_storages::default_storage>;
+        };
+
+        // graph<graph_nodes, graph_edges, storage>
+        template<class... Ts, class... Es, class Storage>
+        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_edges<Es...>, Storage>
+        {
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<Es...>, nds::graph_rules<nds::edge<Ts, Ts>...>, Storage>;
+        };
+
+        // graph<graph_nodes, graph_rules>
         template<class... Ts, class... Us, class... Vs>
-        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
+        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>>
         {
-            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::default_storage>;
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<void>, nds::graph_rules<nds::edge<Us, Vs>...>, graph_storages::default_storage>;
         };
 
-        // graph<Storage, graph_nodes, Graph_edges>
+        // graph<Storage, graph_nodes, graph_rules>
         template<class Storage, class... Ts, class... Us, class... Vs>
-        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, Storage>
+        struct graph_trait<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>, Storage>
         {
-            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, Storage>;
+            using type = graph<nds::graph_nodes<Ts...>, nds::graph_edges<void>, nds::graph_rules<nds::edge<Us, Vs>...>, Storage>;
         };
     } // internal
 } // nds

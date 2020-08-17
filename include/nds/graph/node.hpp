@@ -6,7 +6,10 @@
 
 namespace nds
 {
-    class node_base{};
+    class node_base
+    {
+        virtual uintptr_t id() const = 0;
+    };
 
     template<class T>
     class node : node_base

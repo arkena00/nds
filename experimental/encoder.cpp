@@ -15,7 +15,7 @@ namespace nds
 
 int main()
 {
-    using Edges = nds::graph_edges<
+    using Rules = nds::graph_rules<
             nds::edge<int, char>,
             nds::edge<int, int>
             >;

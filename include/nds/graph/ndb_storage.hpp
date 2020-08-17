@@ -32,7 +32,7 @@ namespace dbs
 namespace nds::internal
 {
         template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::ndb> //: nds::concept<nds::concepts::graph>
+        class graph<nds::graph_nodes<Ts...>, nds::graph_rules<nds::edge<Us, Vs>...>, graph_storages::ndb> //: nds::concept<nds::concepts::graph>
         {
         public:
             template<class T>

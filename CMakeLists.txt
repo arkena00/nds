@@ -16,16 +16,20 @@ file(GLOB_RECURSE NDS_SOURCES
 add_library(lib_nds_object OBJECT ${NDS_SOURCES})
 target_include_directories(lib_nds_object PUBLIC "include")
 
+add_library(lib_lemon INTERFACE)
+target_include_directories(lib_lemon INTERFACE ${NDS_THIRD_PARTY_ROOT}/lemon/include)
+target_link_libraries(lib_lemon INTERFACE ${NDS_THIRD_PARTY_ROOT}/lemon/lib/lemon${CMAKE_STATIC_LIBRARY_SUFFIX})
+
 add_library(lib_nds INTERFACE)
-target_link_libraries(lib_nds INTERFACE lib_nds_object $<TARGET_OBJECTS:lib_nds_object>)
+target_link_libraries(lib_nds INTERFACE lib_nds_object $<TARGET_OBJECTS:lib_nds_object> lib_lemon)
 
 if (NDS_EXPERIMENTAL)
     add_subdirectory(experimental)
-endif ()
+endif()
 
 if (NDS_BENCHMARK)
     add_subdirectory(benchmark)
-endif ()
+endif()
 
 if (NDS_TEST)
     add_subdirectory(test)

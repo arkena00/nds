@@ -10,7 +10,7 @@
 
 int main()
 {
-    using Edges = nds::graph_edges<
+    using Edges = nds::graph_rules<
         nds::edge<int, int>
         >;
 

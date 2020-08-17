@@ -15,15 +15,15 @@
 
 namespace nds
 {
-    namespace algorithm { struct graph; }
+    namespace algorithm { class graph; }
 
     namespace internal
     {
         template<int N, typename... Ts>
         struct argn : std::tuple_element<N, std::tuple<Ts...>>{};
 
-        template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
+        template<class... Ts, class... Es, class... Us, class... Vs>
+        class graph<nds::graph_nodes<Ts...>, nds::graph_edges<Es...>, nds::graph_rules<nds::edge<Us, Vs>...>, graph_storages::tuple_vector>
         {
             friend struct nds::algorithm::graph;
 
@@ -37,7 +37,7 @@ namespace nds
             using internal_node_ptr = std::unique_ptr<node_type<T>>;
 
             using nodes_type = nds::graph_nodes<Ts...>;
-            using edges_type = nds::graph_edges<edge<Us, Vs>...>;
+            using edges_type = nds::graph_rules<edge<Us, Vs>...>;
 
             using node_container_type = std::tuple<std::vector<internal_node_ptr<Ts>>...>;
             using edge_container_type = std::tuple<std::vector<nds::edge<node_ptr<Us>, node_ptr<Vs>>>...>;
