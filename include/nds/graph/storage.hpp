@@ -19,7 +19,7 @@ namespace nds
     struct graph_storage;
 
     template<class... Ts, class... Us, class... Vs>
-    struct graph_storage<graph_storages::tuple_vector, nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
+    struct graph_storage<graph_storages::tuple_vector, nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>>
     {
         template<class T>
         using node_type = node<T>;

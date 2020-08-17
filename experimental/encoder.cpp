@@ -20,7 +20,7 @@ int main()
             nds::edge<int, int>
             >;
 
-    using Types = nds::graph_types<int, char, std::string>;
+    using Types = nds::graph_nodes<int, char, std::string>;
 
     nds::graph<Types, Edges> g;
     auto n1 = g.add<int>(12);

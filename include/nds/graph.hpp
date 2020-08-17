@@ -23,7 +23,7 @@ namespace nds
         struct argn : std::tuple_element<N, std::tuple<Ts...>>{};
 
         template<class... Ts, class... Us, class... Vs>
-        struct graph<nds::graph_types<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
+        struct graph<nds::graph_nodes<Ts...>, nds::graph_edges<nds::edge<Us, Vs>...>, graph_storages::tuple_vector> //: nds::concept<nds::concepts::graph>
         {
             friend struct nds::algorithm::graph;
 
@@ -36,7 +36,7 @@ namespace nds
             template<class T>
             using internal_node_ptr = std::unique_ptr<node_type<T>>;
 
-            using nodes_type = nds::graph_types<Ts...>;
+            using nodes_type = nds::graph_nodes<Ts...>;
             using edges_type = nds::graph_edges<edge<Us, Vs>...>;
 
             using node_container_type = std::tuple<std::vector<internal_node_ptr<Ts>>...>;
@@ -58,7 +58,7 @@ namespace nds
             template<class Source, class Target>
             void erase_arc(node_ptr<Source>, node_ptr<Target>);
 
-            template<class Source, class Target>
+            template<class Edge_type = void, class Source, class Target>
             void add_arc(node_ptr<Source> source, node_ptr<Target> target);
             template<class Source, class Target>
             void connect(node_ptr<Source> source, node_ptr<Target> target); // alias

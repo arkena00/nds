@@ -12,7 +12,7 @@ int main()
         nds::edge<int, int>
         >;
 
-    using Types = nds::graph_types<int, char, std::string>;
+    using Types = nds::graph_nodes<int, char, std::string>;
 
     nds::graph<Types, Edges> g;
 
@@ -27,7 +27,7 @@ int main()
     // g.connect(n3, n4); // char char // error
 
     g.nodes([](auto&& node){ std::cout << "\nnode " << node->get() << " | " << node->get(); });
-    //g.nodes<nds::graph_types<char>>([](auto&& node){ std::cout << "\nnode " << node->get() << " | " << node->get(); });
+    //g.nodes<nds::graph_nodes<char>>([](auto&& node){ std::cout << "\nnode " << node->get() << " | " << node->get(); });
 
     g.targets(n1, [](auto&& node){ std::cout << "\n" << node->get(); });
 

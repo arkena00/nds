@@ -89,7 +89,7 @@ namespace nds
     }
 
     template<class T>
-    T *node_ptr<T>::operator->() const
+    T* node_ptr<T>::operator->() const
     {
         return &node_->get();
     }

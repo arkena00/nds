@@ -14,7 +14,7 @@ int main()
         nds::edge<int, int>
         >;
 
-    using Types = nds::graph_types<int>;
+    using Types = nds::graph_nodes<int>;
 
 
     nds::graph<int> g;

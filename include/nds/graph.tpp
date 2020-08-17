@@ -9,7 +9,7 @@ namespace nds::internal
     //! Base base type of T to store as node<Base> if T is not in the graph
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T>
-    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    auto graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::add(T v)
     {
         // Base = T if Base is not specified
@@ -28,7 +28,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T, class Source>
-    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    auto graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::add(T v, node_ptr<Source> source)
     {
         auto last_node = add<B, T>(std::move(v));
@@ -38,7 +38,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T, class... Args>
-    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    auto graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::emplace(Args&&... args)
     {
         using T0 = typename internal::argn<0, Ts...>::type;
@@ -57,7 +57,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class B, class T, class Source, class... Args>
-    auto graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    auto graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::emplace(node_ptr<Source> source, Args&&... args)
     {
         auto last_node = emplace<B, T>(std::forward<Args>(args)...);
@@ -67,7 +67,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Source>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::erase(node_ptr<Source>& node)
     {
         constexpr int type_index = cx::index_of<std::vector<internal_node_ptr<Source>>, node_container_type>::value;
@@ -86,7 +86,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Source, class Target>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::erase_arc(node_ptr<Source> source, node_ptr<Target> target)
     {
         auto& edges = std::get<std::vector<nds::edge<node_ptr<Source>, node_ptr<Target>>>>(edges_);
@@ -100,8 +100,8 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    template<class Source_type, class Target_type>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    template<class Edge_type, class Source_type, class Target_type>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::add_arc(node_ptr<Source_type> source_, node_ptr<Target_type> target_)
     {
         using Source = std::remove_const_t<Source_type>;
@@ -118,7 +118,7 @@ namespace nds::internal
     }
     template<class... Ts, class... Us, class... Vs>
     template<class Source_type, class Target_type>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::connect(node_ptr<Source_type> source, node_ptr<Target_type> target)
     {
         add_arc(std::move(source), std::move(target));
@@ -126,7 +126,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Nodes, class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::nodes(F&& f) const
     {
         nds::cx::for_each<Nodes>([&f, this](auto&& nt)
@@ -148,7 +148,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Edges, class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::edges(F&& f) const
     {
         nds::cx::for_each<Edges>([&f, this](auto&& et)
@@ -171,7 +171,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Nodes, class Target, class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::sources(node_ptr<Target> target, F&& f) const
     {
         if (!target) return;
@@ -190,7 +190,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Targets, class Source_type, class F>
-    void graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    void graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::targets(node_ptr<Source_type> source_, F&& f) const
     {
         if (!source_) return;
@@ -220,26 +220,26 @@ namespace nds::internal
     }
 
     template<class... Ts, class... Us, class... Vs>
-    std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    std::size_t graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::count_nodes() const
     {
         return std::apply([&](auto&&... vectors) { return (vectors.size() + ...); }, nodes_);
     }
     template<class... Ts, class... Us, class... Vs>
-    std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    std::size_t graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::count_edges() const
     {
         return std::apply([&](auto&&... vectors) { return (vectors.size() + ...); }, edges_);
     }
 
     template<class... Ts, class... Us, class... Vs>
-    constexpr std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    constexpr std::size_t graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::count_nodes_type()
     {
         return sizeof...(Ts);
     }
     template<class... Ts, class... Us, class... Vs>
-    constexpr std::size_t graph<graph_types<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
+    constexpr std::size_t graph<graph_nodes<Ts...>, graph_edges<edge<Us, Vs>...>, graph_storages::tuple_vector>
     ::count_edges_type()
     {
         return 0;//sizeof...(edge<Us..., Vs...>);
@@ -251,7 +251,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class Source, class Target>
-    void graph<graph_types<Ts...>, nds::graph_edges<edge<Us, Vs>...>>
+    void graph<graph_nodes<Ts...>, nds::graph_edges<edge<Us, Vs>...>>
     ::connect(Source* source, Target* target)
     {
         // check edges
@@ -265,7 +265,7 @@ namespace nds::internal
 
     template<class... Ts, class... Us, class... Vs>
     template<class T>
-    void graph<graph_types<Ts...>, nds::graph_edges<edge<Us, Vs>...>>
+    void graph<graph_nodes<Ts...>, nds::graph_edges<edge<Us, Vs>...>>
     ::connect(int s, int t)
     {
         // check edges

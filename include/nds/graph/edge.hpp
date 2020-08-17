@@ -5,7 +5,7 @@
 
 namespace nds
 {
-    template<class Source, class Target>
+    template<class Source, class Target, class Type = void>
     class edge
     {
     public:

@@ -36,7 +36,7 @@ namespace nds::encoders
 int main()
 {
     using Edges = nds::graph_edges<nds::edge<page, page>, nds::edge<::node, page>, nds::edge<page, ::node>>;
-    using Types = nds::graph_types<page, node>;
+    using Types = nds::graph_nodes<page, node>;
 
     nds::graph<Types, Edges> g;
 

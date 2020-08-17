@@ -175,7 +175,7 @@ TEST(graph, connecting_multi)
     EXPECT_TRUE( v_nodes[0] == 1 && v_nodes[1] == 2 && v_nodes[2] == 'A' );
 
     std::vector<char> v_char_nodes;
-    g.nodes<nds::graph_types<char>>([&v_char_nodes](auto&& node) { v_char_nodes.push_back(*node); });
+    g.nodes<nds::graph_nodes<char>>([&v_char_nodes](auto&& node) { v_char_nodes.push_back(*node); });
     EXPECT_TRUE( v_char_nodes[0] == 'A' && v_char_nodes[1] == 'B' );
 
     std::vector<int> v_targets;
@@ -184,12 +184,12 @@ TEST(graph, connecting_multi)
     EXPECT_TRUE( v_targets[0] == 2 && v_targets[1] == 'A' );
 
     std::vector<char> v_char_targets;
-    g.targets<nds::graph_types<char>>(n0, [&v_char_targets](auto&& node) { v_char_targets.push_back(*node); });
+    g.targets<nds::graph_nodes<char>>(n0, [&v_char_targets](auto&& node) { v_char_targets.push_back(*node); });
     ASSERT_TRUE( v_char_targets.size() == 2 );
     EXPECT_TRUE( v_char_targets[0] == 'A' && v_char_targets[1] == 'B' );
 
     std::vector<char> v_int_targets;
-    g.targets<nds::graph_types<int>>(n0, [&v_int_targets](auto&& node) { v_int_targets.push_back(*node); });
+    g.targets<nds::graph_nodes<int>>(n0, [&v_int_targets](auto&& node) { v_int_targets.push_back(*node); });
     ASSERT_TRUE( v_int_targets.size() == 1 );
     EXPECT_TRUE( v_int_targets[0] == 2  );
 

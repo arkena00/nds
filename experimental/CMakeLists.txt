@@ -20,6 +20,8 @@ exp_make(graph)
 exp_make(graph_type)
 exp_make(graph_bfs)
 exp_make(graph_struct)
+exp_make(graph_edge_type)
+exp_make(lemon)
 
 
 exp_make(graph2)
