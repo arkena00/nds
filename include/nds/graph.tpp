@@ -114,7 +114,7 @@ namespace nds::internal
         constexpr int type_index = cx::index_of<std::vector<edge<node_ptr<Source>, node_ptr<Target>>>, edge_container_type>::value;
         // static_assert(index >= 0, "connection between U and V not allowed");
 
-        std::get<type_index>(edges_).emplace_back(edge<node_ptr<Source>, node_ptr<Target>, Edge_type>{ source, target, edge_type });
+        std::get<type_index>(edges_).emplace_back(edge<node_ptr<Source>, node_ptr<Target>, Edge_type>{ source, target });
     }
     template<class... Ts, class... Es, class... Us, class... Vs>
     template<class Source_type, class Target_type>
