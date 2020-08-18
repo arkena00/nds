@@ -15,7 +15,7 @@
 
 namespace nds
 {
-    namespace algorithm { class graph; }
+    namespace algorithm { struct graph; }
 
     namespace internal
     {

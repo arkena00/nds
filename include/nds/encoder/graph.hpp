@@ -37,7 +37,13 @@ namespace nds
             template<class T>
             static std::string node_name(const T& v)
             {
-                return "no_name";
+                return "node_name";
+            }
+
+            template<class T>
+            static std::string edge_name(const T& v)
+            {
+                return "edge_name";
             }
 
             template<class Output, class Input, class... Options> // Input concept : graph

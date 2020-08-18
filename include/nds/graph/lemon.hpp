@@ -19,9 +19,14 @@ namespace nds
             using type = T;
 
         public:
-            node_ptr(::lemon::ListDigraph::Node lnode, node_type ptr = nullptr)
-                : lnode_{ std::move(lnode) }
+            explicit node_ptr(::lemon::ListDigraph::Node lnode, node_type ptr = nullptr)
+                : lnode_{ lnode }
                 , node_{ ptr }
+            {}
+
+            node_ptr()
+                : lnode_{}
+                , node_{ nullptr }
             {}
 
             const auto& id() const { return lnode_; }
@@ -42,7 +47,31 @@ namespace nds
             ::lemon::ListDigraph::Node lnode_;
             node_type node_;
         };
-    }
+
+        //
+
+        template<class Source, class Target>
+        class edge
+        {
+        public:
+            using source_type = Source;
+            using target_type = Target;
+
+            edge(Source s, Target t)
+                : source{ std::move(s) }
+                , target{ std::move(t) }
+            {}
+
+            Source source;
+            Target target;
+        };
+
+
+
+    } // lemon
+
+
+    //
 
 
     namespace algorithm { class graph; }
@@ -95,6 +124,14 @@ namespace nds
                 return lemon::node_ptr<Base>(last_node_id, last_node);
             }
 
+            template<class B = void, class T, class Source>
+            auto add(T v, lemon::node_ptr<Source> source)
+            {
+                auto last_node = add(std::move(v));
+                add_arc(source, last_node);
+                return last_node;
+            }
+
             template<class Edge_type, class Source_type, class Target_type>
             void add_arc(lemon::node_ptr<Source_type> source, lemon::node_ptr<Target_type> target, Edge_type&& edge)
             {
@@ -129,11 +166,11 @@ namespace nds
                      {
                          for (::lemon::ListDigraph::OutArcIt i(graph_, source.id()); i != ::lemon::INVALID; ++i)
                             {
-                                auto node_data = std::get<0>(nodes_)[graph_.target(i)];
+                                auto node_data = std::get<0>(nodes_)[graph_.baseNode(i)];
                                 auto edge_data = std::get<edge_index>(edges_)[i];
                                 if (edge_data)
                                 {
-                                    nds::lemon::node_ptr<std::remove_pointer_t<decltype(node_data)>> ptr(graph_.target(i), node_data);
+                                    nds::lemon::node_ptr<std::remove_pointer_t<decltype(node_data)>> ptr(graph_.baseNode(i), node_data);
                                     f(std::move(ptr), edge_data);
                                 }
                             }
@@ -150,10 +187,36 @@ namespace nds
 
                 for (::lemon::ListDigraph::OutArcIt i(graph_, source.id()); i != ::lemon::INVALID; ++i)
                 {
-                    auto node_data = std::get<0>(nodes_)[graph_.target(i)];
-                    nds::lemon::node_ptr<std::remove_pointer_t<decltype(node_data)>> ptr(graph_.target(i), node_data);
+                    auto node_data = std::get<0>(nodes_)[graph_.baseNode(i)];
+                    nds::lemon::node_ptr<std::remove_pointer_t<decltype(node_data)>> ptr(graph_.baseNode(i), node_data);
                     f(std::move(ptr));
                 }
+            }
+
+            template<class F>
+            void edges(F&& f) const
+            {
+                auto loop_edge_type = [&f, this](auto&& et)
+                {
+                    //using graph_edge_type = typename std::decay_t<decltype(et)>::type;
+                    //if constexpr (std::is_same_v<input_edge_type, graph_edge_type>)
+                    {
+                        //for (auto&& edge : vector) f(edge);
+
+                        for (::lemon::ListDigraph::ArcIt i(graph_); i != ::lemon::INVALID; ++i)
+                        {
+                            auto source_node_data = std::get<0>(nodes_)[graph_.source(i)];
+                            nds::lemon::node_ptr<std::remove_pointer_t<decltype(source_node_data)>> source_ptr(graph_.source(i), source_node_data);
+                            auto target_node_data = std::get<0>(nodes_)[graph_.target(i)];
+                            nds::lemon::node_ptr<std::remove_pointer_t<decltype(target_node_data)>> target_ptr(graph_.target(i), target_node_data);
+
+                            nds::lemon::edge e{ source_ptr, target_ptr };
+                            f(e);
+                        }
+                    }
+                };
+
+                std::apply([&, this](auto&&... maps) { (loop_edge_type(maps), ...); }, edges_);
             }
 
             template<class B = void, class T = B, class... Args>

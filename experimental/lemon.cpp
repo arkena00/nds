@@ -48,9 +48,9 @@ int main()
     gg.targets(n00, [](auto&& n) { std::cout << "\n__" << n->name; } );
 
 
-/*
+
     lemon::ListDigraph g;
-    lemon::ListDigraph::ArcMap<edgemap<int>> e_map(g);
+    //lemon::ListDigraph::ArcMap<int> e_map(g);
 
     auto id = new id_expression("ngl");
     auto id1 = new id_expression("ngl1");
@@ -73,15 +73,16 @@ int main()
 
     auto a = g.addArc(n0, n1);
     auto b = g.addArc(n0, n2);
-    e_map[a] = 0;
+    //e_map[a] = 0;
 
 
-    for (lemon::ListDigraph::OutArcIt i(g, n0); i != lemon::INVALID; ++i)
+    for (lemon::ListDigraph::ArcIt i(g); i != lemon::INVALID; ++i)
     {
-        std::cout << "\n" << n0_map[g.target(i)]->name_;
+        std::cout << n0_map[g.source(i)]->name;
+        //std::cout << "\n" << n0_map[g.baseNode(i)]->name;
     }
 
-*/
+
 
     /*
     lemon::graphToEps(g,"descriptor_map_demo.eps").scaleToA4().
