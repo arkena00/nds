@@ -107,6 +107,12 @@ namespace nds
                 std::get<edge_index>(edges_)[last_arc_id] = e;
             }
 
+            template<class Source_type, class Target_type>
+            void add_arc(lemon::node_ptr<Source_type> source, lemon::node_ptr<Target_type> target)
+            {
+                auto last_arc_id =graph_.addArc(source.id(), target.id());
+            }
+
             template<class Edge_type, class Source_type, class F>
             void targets(lemon::node_ptr<Source_type> source_, F&& f) const
             {
@@ -133,6 +139,21 @@ namespace nds
                             }
                      }
                 });
+            }
+
+            template<class Source_type, class F>
+            void targets(lemon::node_ptr<Source_type> source_, F&& f) const
+            {
+                if (!source_) return;
+                using Source = std::remove_const_t<Source_type>;
+                lemon::node_ptr<Source> source{ source_.id(), const_cast<node_type<Source>*>(source_.get()) };
+
+                for (::lemon::ListDigraph::OutArcIt i(graph_, source.id()); i != ::lemon::INVALID; ++i)
+                {
+                    auto node_data = std::get<0>(nodes_)[graph_.target(i)];
+                    nds::lemon::node_ptr<std::remove_pointer_t<decltype(node_data)>> ptr(graph_.target(i), node_data);
+                    f(std::move(ptr));
+                }
             }
 
             template<class B = void, class T = B, class... Args>

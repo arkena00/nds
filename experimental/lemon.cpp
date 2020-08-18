@@ -32,20 +32,20 @@ int main()
 
     nds::graph<Nodes, Edges, nds::graph_storages::lemon> gg;
 
-    auto n00 = gg.emplace("ngl");
+    auto n00 = gg.add(id_expression("ngl"));
 
 
     auto n01 = gg.add(id_expression("ngl01"));
     auto n02 = gg.add(id_expression("ngl02"));
     auto n03 = gg.add(id_expression("ngl03"));
 
-    gg.add_arc(n00, n01, edges::has{});
+    gg.add_arc(n00, n01);
     gg.add_arc(n00, n02, edges::is{ 7, "aze" });
     gg.add_arc(n00, n03, edges::is{ 6, "pouet" });
 
     //nds::edge<edges::has> e{  };
 
-    gg.targets<edges::is>(n00, [](auto&& n, auto&& e) { std::cout << "\n__" << n->name <<  " " << e->truc; } );
+    gg.targets(n00, [](auto&& n) { std::cout << "\n__" << n->name; } );
 
 
 /*
