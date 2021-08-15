@@ -21,7 +21,8 @@ target_include_directories(lib_lemon INTERFACE ${NDS_THIRD_PARTY_ROOT}/lemon/inc
 target_link_libraries(lib_lemon INTERFACE ${NDS_THIRD_PARTY_ROOT}/lemon/lib/lemon${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 add_library(lib_nds INTERFACE)
-target_link_libraries(lib_nds INTERFACE lib_nds_object $<TARGET_OBJECTS:lib_nds_object> lib_lemon)
+# target_link_libraries(lib_nds INTERFACE lib_nds_object $<TARGET_OBJECTS:lib_nds_object> lib_lemon)
+target_link_libraries(lib_nds INTERFACE lib_nds_object $<TARGET_OBJECTS:lib_nds_object>)
 
 if (NDS_EXPERIMENTAL)
     add_subdirectory(experimental)
