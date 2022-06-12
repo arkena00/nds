@@ -1,5 +1,5 @@
 
 target("lib_nds")
-    set_kind("headeronly")
-    add_includedirs("include", {interface = true})
+    set_kind("static")
+    add_includedirs("include", { public = true })
     add_files("source/**/*.cpp")
