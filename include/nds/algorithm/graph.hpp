@@ -69,7 +69,7 @@ namespace nds::algorithm
             auto f = [&](auto&& node)
             {
                 has_source = false;
-                g.sources<nds::graph_nodes<T>>(node, [&](auto path_node)
+                g.template sources<nds::graph_nodes<T>>(node, [&](auto path_node)
                 {
                     if constexpr(std::is_same_v<decltype(path_node), nds::node_ptr<T>>)
                     {
