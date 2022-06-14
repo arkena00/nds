@@ -82,6 +82,6 @@ namespace nds
 
 } // nds
 
-#include "encoder.tcc"
+#include "encoder.tpp"
 
 #endif // NDS_ENCODER_H_NDS
