@@ -1,6 +1,6 @@
 
-target("lib_nds")
+target("nds")
     set_kind("static")
     add_includedirs("include", { public = true })
     add_files("source/**/*.cpp")
-    add_headerfiles("include/(**.hpp)")
+    add_headerfiles("include/(**.hpp)", "include/(**.tpp)")
